@@ -1015,21 +1015,24 @@ async function generate() {
     return;
   }
 
-  const alias = generateAlias();
+  // --- Suppression de la partie Cloudflare KV ---
+  // const alias = generateAlias();
+  // try {
+  //   const response = await fetch(`${KV_WORKER_URL}/store`, {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ alias, url: webhook })
+  //   });
+  //   if (!response.ok) throw new Error('KV store failed');
+  // } catch (error) {
+  //   console.error(error);
+  //   out.className = 'code-block empty';
+  //   out.textContent = '-- Error while saving in Cloudflare KV.';
+  //   return;
+  // }
 
-  try {
-    const response = await fetch(`${KV_WORKER_URL}/store`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ alias, url: webhook })
-    });
-    if (!response.ok) throw new Error('KV store failed');
-  } catch (error) {
-    console.error(error);
-    out.className = 'code-block empty';
-    out.textContent = '-- Error while saving in Cloudflare KV.';
-    return;
-  }
+  // --- Utilise directement le webhook ---
+  const alias = webhook; // On utilise le webhook directement au lieu d'un alias
 
   const names = [...selected];
   const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
