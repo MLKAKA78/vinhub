@@ -46,6 +46,33 @@
     margin: 0 auto;
     padding: 2.8rem 1.5rem 6rem;
   }
+  /* Badges */
+  .badge-og {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 157, 0, 0.15);
+    color: rgb(255, 157, 0);
+    border: 1px solid rgba(255, 157, 0, 0.3);
+    margin-left: 8px;
+    cursor: default;
+  }
+  .badge-secret {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    color: rgb(255, 255, 255);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-left: 8px;
+    cursor: default;
+  }
   /* ── Header ── */
   header {
     text-align: center;
@@ -678,32 +705,40 @@ function updateCustomAdmin() {
 }
 
 function renderList(filter) {
-  const q = (filter || '').toLowerCase();
-  const list = document.getElementById('animalList');
-  list.innerHTML = '';
-  ANIMALS.forEach(animal => {
-    if (q && !animal.name.toLowerCase().includes(q)) return;
-    const row = document.createElement('div');
-    row.className = 'a-item' + (selected.has(animal.name) ? ' on' : '');
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = selected.has(animal.name);
-    cb.addEventListener('change', e => { e.stopPropagation(); toggle(animal.name); });
-    const lbl = document.createElement('span');
-    lbl.className = 'a-name';
-    lbl.textContent = animal.name;
-    const meta = document.createElement('span');
-    meta.className = 'a-meta';
-    meta.textContent = `${animal.rarity} • ${animal.mps}`;
-    row.appendChild(cb);
-    row.appendChild(lbl);
-    row.appendChild(meta);
-    row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
-    list.appendChild(row);
-  });
-  document.getElementById('selNum').textContent = selected.size;
-}
+    const q = (filter || '').toLowerCase();
+    const list = document.getElementById('animalList');
+    list.innerHTML = '';
+    ANIMALS.forEach(animal => {
+      if (q && !animal.name.toLowerCase().includes(q)) return;
+      const row = document.createElement('div');
+      row.className = 'a-item' + (selected.has(animal.name) ? ' on' : '');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = selected.has(animal.name);
+      cb.addEventListener('change', e => { e.stopPropagation(); toggle(animal.name); });
 
+      const lbl = document.createElement('span');
+      lbl.className = 'a-name';
+      lbl.textContent = animal.name;
+
+      // Badge OG ou Secret
+      const badge = document.createElement('span');
+      badge.className = animal.rarity === 'OG' ? 'badge-og' : 'badge-secret';
+      badge.textContent = animal.rarity;
+
+      const mps = document.createElement('span');
+      mps.className = 'a-meta';
+      mps.textContent = animal.mps;
+
+      row.appendChild(cb);
+      row.appendChild(lbl);
+      row.appendChild(badge);
+      row.appendChild(mps);
+      row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
+      list.appendChild(row);
+    });
+    document.getElementById('selNum').textContent = selected.size;
+  }
 function toggle(name) {
   selected.has(name) ? selected.delete(name) : selected.add(name);
   renderList(document.getElementById('searchBox').value);
