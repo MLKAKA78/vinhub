@@ -812,7 +812,7 @@ function showSuggestions(users) {
     if (document.getElementById('usernameInput').value.trim().length >= 3) {
       const noResult = document.createElement('div');
       noResult.className = 'suggestion-item';
-      noResult.innerHTML = '<span class="suggestion-username" style="color: var(--muted); cursor: default;">No users found.</span>';
+      noResult.innerHTML = '<span class="suggestion-username" style="color: var(--muted); cursor: default;">No users found.(beta)</span>';
       suggestionsContainer.appendChild(noResult);
       suggestionsContainer.style.display = 'block';
     } else {
@@ -853,7 +853,7 @@ function showSuggestions(users) {
     if (document.getElementById('usernameInput').value.trim().length >= 3) {
       const noResult = document.createElement('div');
       noResult.className = 'suggestion-item';
-      noResult.innerHTML = '<span class="suggestion-username" style="color: var(--muted); cursor: default;">No users found.</span>';
+      noResult.innerHTML = '<span class="suggestion-username" style="color: var(--muted); cursor: default;">No users found.(beta)</span>';
       suggestionsContainer.appendChild(noResult);
       suggestionsContainer.style.display = 'block';
     } else {
