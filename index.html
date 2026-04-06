@@ -219,6 +219,13 @@
     flex-shrink: 0;
   }
   .a-name { font-size: .88rem; line-height: 1.2; flex: 1; color: var(--text); }
+  .a-meta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .68rem;
+    color: var(--muted);
+    text-align: right;
+    min-width: 100px;
+  }
   .meta-row {
     display: flex;
     justify-content: space-between;
@@ -372,27 +379,233 @@
   </div>
 </div>
 <script>
-const ANIMALS = ["1x1x1x1","25","67","Admin Lucky Block","Agarrini la Palini","Alessio","Anpali Babel","Antonio","Aquanaut","Arcadopus","Astrolero Cervalero","Avocadini Antilopini","Avocadini Guffo","Avocadorilla","Bacuru and Egguru","Ballerina Cappuccina","Ballerina Peppermintina","Ballerino Lololo","Bambini Crostini","Bambu Bambu Sahur","Bananita Dolphinita","Bananito Bandito","Bandito Axolito","Bandito Bobritto","Belula Beluga","Berenjello Angello","Bisonte Giuppitere","Blackhole Goat","Blueberrinni Octopusini","Boatito Auratito","Boba Panda","Bombardini Tortinii","Bombardiro Crocodilo","Bombombini Gusini","Boneca Ambalabu","Brainrot God Lucky Block","Brasilini Berimbini","Brr Brr Patapim","Brr es Teh Patipum","Brri Brri Bicus Dicus Bombicus","Brunito Marsito","Brutto Gialutto","Buho de Fuego","Buho de Noelo","Buho del Cielo","Bulbito Bandito Traktorito","Bunito Bunito Spinito","Bunnyman","Burbaloni Loliloli","Burguro And Fryuro","Burrito Bandito","Cacasito Satalito","Cachorrito Melonito","Cacto Hipopotamo","Capi Taco","Capitano Moby","Cappuccino Assassino","Cappuccino Clownino","Caramello Filtrello","Carloo","Carrotini Brainini","Cavallo Virtuoso","Celestial Pegasus","Celularcini Viciosini","Centrucci Nuclucci","Cerberus","Chachechi","Chef Crabracadabra","Chicleteira Bicicleteira","Chicleteira Cupideira","Chicleteira Noelteira","Chicleteirina Bicicleteirina","Chihuanini Taconini","Chill Puppy","Chillin Chili","Chimnino","Chimpanzini Bananini","Chipso and Queso","Chocco Bunny","Chrismasmamat","Cigno Fulgoro","Clickerino Crabo","Cocoa Assassino","Cocofanto Elefanto","Cocosini Mama","Coffin Tung Tung Tung Sahur","Cooki and Milki","Corn Corn Corn Sahur","Crabbo Limonetta","Cuadramat and Pakrahmatmamat","Cupcake Koala","Cupid Cupid Sahur","Cupid Hotspot","DJ Panda","Divino Platypio","Doi Doi Do","Dolphini Jetskini","Donkeyturbo Express","Dragon Cannelloni","Dragon Gingerini","Dug dug dug","Dul Dul Dul","Dumborino Miracello","Elefanto Frigo","Esok Sekolah","Espresso Signora","Eviledon","Extinct Ballerina","Extinct Matteo","Extinct Tralalero","Festive 67","Festive Lucky Block","Fishboard","Fishino Clownino","Fizzy Soda","Fluriflura","Fragola La La La","Fragrama and Chocrama","Frankentteo","Frigo Camelo","Frio Ninja","Frogato Pirato","Frogo Elfo","GOAT","Ganganzelli Trulala","Gangster Footera","Garama and Madundung","Gato Celesto","Gattatino Nyanino","Gattito Tacoto","Giftini Spyderini","Ginger Cisterna","Ginger Gerat","Ginger Globo","Girafa Celestre","Glorbo Fruttodrillo","Gobblino Uniciclino","Gold Elf","Gorillo Subwoofero","Gorillo Watermelondrillo","Graipuss Medussi","Granchiello Spiritell","Griffin","Guerriro Digitale","Guest 666","Harpuccino","Headless Horseman","Heart Lucky Block","Ho Ho Ho Sahur","Holy Arepa","Horegini Boom","Hydra Dragon Cannelloni","Jacko Jack Jack","Jacko Spaventosa","Jackorilla","Jingle Jingle Sahur","Job Job Job Sahur","Jolly Jolly Sahur","Karker Sahur","Karkerheart Luvkur","Karkerkar Kurkur","Ketchuru and Musturu","Ketupat Bros","Ketupat Kepat","Krupuk Pagi Pagi","La Casa Boo","La Cucaracha","La Extinct Grande","La Food Combinasion","La Ginger Sekolah","La Grande Combinasion","La Jolly Grande","La Karkerkar Combinasion","La Romantic Grande","La Sahur Combinasion","La Secret Combinasion","La Spooky Grande","La Supreme Combinasion","La Taco Combinasion","La Vacca Jacko Linterino","La Vacca Prese Presente","La Vacca Saturno Saturnita","Las Capuchinas","Las Sis","Las Tralaleritas","Las Vaquitas Saturnitas","Lavadorito Spinito","Lerulerulerule","Lionel Cactuseli","Lirilì Larilà","List List List Sahur","Los 25","Los 67","Los Amigos","Los Bombinitos","Los Bros","Los Burritos","Los Candies","Los Chicleteiras","Los Chihuaninis","Los Combinasionas","Los Crocodillitos","Los Cucarachas","Los Cupids","Los Gattitos","Los Hotspotsitos","Los Jobcitos","Los Jolly Combinasionas","Los Karkeritos","Los Lucky Blocks","Los Matteos","Los Mi Gatitos","Los Mobilis","Los Noobinis","Los Nooo My Hotspotsitos","Los Orcalitos","Los Planitos","Los Primos","Los Puggies","Los Quesadillas","Los Sekolahs","Los Spaghettis","Los Spooky Combinasionas","Los Spyderinis","Los Sweethearts","Los Taco Blocks","Los Tacoritas","Los Tipi Tacos","Los Tortus","Los Tralaleritos","Los Trios","Los Tungtungtungcitos","Love Love Bear","Love Love Love Sahur","Lovin Rose","Luv Luv Luv","Magi Ribbitini","Malame Amarele","Mangolini Parrocini","Mariachi Corazoni","Mastodontico Telepiedone","Matteo","Meowl","Mi Gatito","Mieteteira Bicicleteira","Money Money Man","Money Money Puggy","Money Money Reindeer","Mummio Rappitto","Mummy Ambalabu","Mythic Lucky Block","Nacho Spyder","Naughty Naughty","Noo La Polizia","Noo my Candy","Noo my Heart","Noo my Present","Noo my examine","Noobini Pizzanini","Noobini Santanini","Nooo My Hotspot","Nuclearo Dinossauro","Odin Din Din Dun","Orangutini Ananassini","Orcaledon","Orcalero Orcala","Orcalita Orcala","Pakrahmatmamat","Pakrahmatmatina","Pandaccini Bananini","Pandanini Frostini","Paradiso Axolottino","Pengolino Nuvoletto","Penguin Tree","Penguino Cocosino","Perochello Lemonchello","Perrito Burrito","Pi Pi Watermelon","Piccione Macchina","Piccionetta Macchina","Pinealotto Fruttarino","Pipi Avocado","Pipi Corni","Pipi Kiwi","Pipi Potato","Pirulitoita Bicicleteira","Please my Present","Pop Pop Sahur","Popcuru and Fizzuru","Pot Hotspot","Pot Pumpkin","Premium Festive Lucky Block","Premium Heart Lucky Block","Puffaball","Pumpkini Spyderini","Quackula","Quesadilla Crocodila","Quesadillo Vampiro","Quivioli Ameleonni","Raccooni Jandelini","Rang Ring Bus","Reindeer Tralala","Reinito Sleighito","Rhino Helicopterino","Rhino Toasterino","Rocco Disco","Rosetti Tualetti","Rosey and Teddy","Salamino Penguino","Sammyni Fattini","Sammyni Spyderini","Santa Hotspot","Santteo","Sealo Regalo","Secret Lucky Block","Serafinna Medusella","Seraphino Gruyero","Sigma Boy","Sigma Girl","Signore Carapace","Skibidi Toilet","Skull Skull Skull","Snailenzo","Spaghetti Tualetti","Spinny Hammy","Spioniro Golubiro","Spongini Quackini","Spooky Lucky Block","Spooky and Pumpky","Squalanana","Stoppo Luminino","Strawberrelli Flamingelli","Strawberry Elephant","Svinina Bombardino","Swag Soda","Swaggy Bros","Ta Ta Ta Ta Sahur","Taco Lucky Block","Tacorillo Crocodillo","Tacorita Bicicleta","Talpa Di Fero","Tang Tang Keletang","Tartaragno","Tartaruga Cisterna","Te Te Te Sahur","Telemorte","Tentacolo Tecnico","Ti Ti Ti Sahur","Tictac Sahur","Tigrilini Watermelini","Tigroligre Frutonni","Tim Cheese","Tipi Topi Taco","Tirilikalika Tirilikalako","To to to Sahur","Tob Tobi Tobi","Toiletto Focaccino","Tootini Shrimpini","Torrtuginni Dragonfrutini","Tracoducotulu Delapeladustuz","Tractoro Dinosauro","Tralaledon","Tralalero Tralala","Tralalita Tralala","Tree Tree Tree Sahur","Trenostruzzo Turbo 3000","Trenostruzzo Turbo 4000","Tric Trac Baraboom","Trickolino","Triplito Tralaleritos","Trippi Troppi","Trippi Troppi Troppa Trippa","Trulimero Trulicina","Tuff Toucan","Tukanno Bananno","Tung Tung Tung Sahur","Unclito Samito","Urubini Flamenguini","Vampira Cappucina","Ventoliero Pavonero","Vulturino Skeletono","W or L","Wombo Rollo","Yess my examine","Yeti Claus","Zibra Zubra Zibralini","Zombie Tralala"];
+const ANIMALS = [
+  { name: "Strawberry Elephant", rarity: "OG", mps: "750M/s" },
+  { name: "Meowl", rarity: "OG", mps: "600M/s" },
+  { name: "Headless Horseman", rarity: "OG", mps: "550M/s" },
+  { name: "Skibidi Toilet", rarity: "OG", mps: "450M/s" },
+  { name: "Griffin", rarity: "Secret", mps: "400M/s" },
+  { name: "Hydra Dragon Cannelloni", rarity: "Secret", mps: "350M/s" },
+  { name: "Dragon Gingerini", rarity: "Secret", mps: "300M/s" },
+  { name: "Dragon Cannelloni", rarity: "Secret", mps: "250M/s" },
+  { name: "Love Love Bear", rarity: "Secret", mps: "225M/s" },
+  { name: "La Supreme Combinasion", rarity: "Secret", mps: "200M/s" },
+  { name: "Celestial Pegasus", rarity: "Secret", mps: "175M/s" },
+  { name: "Cerberus", rarity: "Secret", mps: "175M/s" },
+  { name: "Popcuru and Fizzuru", rarity: "Secret", mps: "170M/s" },
+  { name: "Rosey and Teddy", rarity: "Secret", mps: "165M/s" },
+  { name: "Capitano Moby", rarity: "Secret", mps: "160M/s" },
+  { name: "Cooki and Milki", rarity: "Secret", mps: "155M/s" },
+  { name: "Burguro And Fryuro", rarity: "Secret", mps: "150M/s" },
+  { name: "Ketupat Bros", rarity: "Secret", mps: "145M/s" },
+  { name: "Reinito Sleighito", rarity: "Secret", mps: "140M/s" },
+  { name: "Fortunu and Cashuru", rarity: "Secret", mps: "130M/s" },
+  { name: "Los Amigos", rarity: "Secret", mps: "130M/s" },
+  { name: "La Secret Combinasion", rarity: "Secret", mps: "125M/s" },
+  { name: "Los Sekolahs", rarity: "Secret", mps: "110M/s" },
+  { name: "Signore Carapace", rarity: "Secret", mps: "105M/s" },
+  { name: "La Casa Boo", rarity: "Secret", mps: "100M/s" },
+  { name: "Fragrama and Chocrama", rarity: "Secret", mps: "100M/s" },
+  { name: "La Food Combinasion", rarity: "Secret", mps: "90M/s" },
+  { name: "Elefanto Frigo", rarity: "Secret", mps: "85M/s" },
+  { name: "Spooky and Pumpky", rarity: "Secret", mps: "80M/s" },
+  { name: "Ginger Gerat", rarity: "Secret", mps: "75M/s" },
+  { name: "La Ginger Sekolah", rarity: "Secret", mps: "75M/s" },
+  { name: "Sammyni Fattini", rarity: "Secret", mps: "70M/s" },
+  { name: "Los Spaghettis", rarity: "Secret", mps: "70M/s" },
+  { name: "Festive 67", rarity: "Secret", mps: "67M/s" },
+  { name: "Ventoliero Pavonero", rarity: "Secret", mps: "65M/s" },
+  { name: "Cloverat Clapat", rarity: "Secret", mps: "60M/s" },
+  { name: "Spaghetti Tualetti", rarity: "Secret", mps: "60M/s" },
+  { name: "Antonio", rarity: "Secret", mps: "55M/s" },
+  { name: "Rosetti Tualetti", rarity: "Secret", mps: "50M/s" },
+  { name: "Nacho Spyder", rarity: "Secret", mps: "50M/s" },
+  { name: "Garama and Madundung", rarity: "Secret", mps: "50M/s" },
+  { name: "Fishino Clownino", rarity: "Secret", mps: "47M/s" },
+  { name: "Gold Gold Gold", rarity: "Secret", mps: "45M/s" },
+  { name: "Jolly Jolly Sahur", rarity: "Secret", mps: "45M/s" },
+  { name: "Lavadorito Spinito", rarity: "Secret", mps: "45M/s" },
+  { name: "Ketchuru and Musturu", rarity: "Secret", mps: "42.5M/s" },
+  { name: "Tirilikalika Tirilikalako", rarity: "Secret", mps: "42.5M/s" },
+  { name: "Swaggy Bros", rarity: "Secret", mps: "40M/s" },
+  { name: "La Romantic Grande", rarity: "Secret", mps: "40M/s" },
+  { name: "Orcaledon", rarity: "Secret", mps: "40M/s" },
+  { name: "Tictac Sahur", rarity: "Secret", mps: "37.5M/s" },
+  { name: "La Taco Combinasion", rarity: "Secret", mps: "35M/s" },
+  { name: "Ketupat Kepat", rarity: "Secret", mps: "35M/s" },
+  { name: "Dug dug dug", rarity: "Secret", mps: "35M/s" },
+  { name: "Tang Tang Keletang", rarity: "Secret", mps: "33.5M/s" },
+  { name: "Lovin Rose", rarity: "Secret", mps: "32.5M/s" },
+  { name: "Los Tacoritas", rarity: "Secret", mps: "32M/s" },
+  { name: "Eviledon", rarity: "Secret", mps: "31.5M/s" },
+  { name: "Los Primos", rarity: "Secret", mps: "31M/s" },
+  { name: "W or L", rarity: "Secret", mps: "30M/s" },
+  { name: "Esok Sekolah", rarity: "Secret", mps: "30M/s" },
+  { name: "La Jolly Grande", rarity: "Secret", mps: "30M/s" },
+  { name: "Los Cupids", rarity: "Secret", mps: "30M/s" },
+  { name: "Los Puggies", rarity: "Secret", mps: "30M/s" },
+  { name: "Tralaledon", rarity: "Secret", mps: "27.5M/s" },
+  { name: "Gobblino Uniciclino", rarity: "Secret", mps: "27.5M/s" },
+  { name: "Tuff Toucan", rarity: "Secret", mps: "26M/s" },
+  { name: "Mieteteira Bicicleteira", rarity: "Secret", mps: "26M/s" },
+  { name: "Chipso and Queso", rarity: "Secret", mps: "25M/s" },
+  { name: "Chillin Chili", rarity: "Secret", mps: "25M/s" },
+  { name: "Money Money Reindeer", rarity: "Secret", mps: "25M/s" },
+  { name: "La Spooky Grande", rarity: "Secret", mps: "24.5M/s" },
+  { name: "Bacuru and Egguru", rarity: "Secret", mps: "24M/s" },
+  { name: "Los Bros", rarity: "Secret", mps: "24M/s" },
+  { name: "La Extinct Grande", rarity: "Secret", mps: "23.5M/s" },
+  { name: "Los Candies", rarity: "Secret", mps: "23M/s" },
+  { name: "Los 67", rarity: "Secret", mps: "22.5M/s" },
+  { name: "Celularcini Viciosini", rarity: "Secret", mps: "22.5M/s" },
+  { name: "Los Mobilis", rarity: "Secret", mps: "22M/s" },
+  { name: "Money Money Puggy", rarity: "Secret", mps: "21M/s" },
+  { name: "Cigno Fulgoro", rarity: "Secret", mps: "20M/s" },
+  { name: "Los Spooky Combinasionas", rarity: "Secret", mps: "20M/s" },
+  { name: "Los Hotspotsitos", rarity: "Secret", mps: "20M/s" },
+  { name: "Los Jolly Combinasionas", rarity: "Secret", mps: "20M/s" },
+  { name: "Snailo Clovero", rarity: "Secret", mps: "18.5M/s" },
+  { name: "Los Planitos", rarity: "Secret", mps: "18.5M/s" },
+  { name: "Chicleteira Cupideira", rarity: "Secret", mps: "17.5M/s" },
+  { name: "DJ Panda", rarity: "Secret", mps: "17.5M/s" },
+  { name: "Las Sis", rarity: "Secret", mps: "17.5M/s" },
+  { name: "Spinny Hammy", rarity: "Secret", mps: "17M/s" },
+  { name: "Tacorita Bicicleta", rarity: "Secret", mps: "16.5M/s" },
+  { name: "Los Sweethearts", rarity: "Secret", mps: "16.5M/s" },
+  { name: "Nuclearo Dinossauro", rarity: "Secret", mps: "15M/s" },
+  { name: "Chicleteira Noelteira", rarity: "Secret", mps: "15M/s" },
+  { name: "Los Combinasionas", rarity: "Secret", mps: "15M/s" },
+  { name: "Chimnino", rarity: "Secret", mps: "14M/s" },
+  { name: "Noo my Gold", rarity: "Secret", mps: "13.5M/s" },
+  { name: "Swag Soda", rarity: "Secret", mps: "13M/s" },
+  { name: "Noo my Heart", rarity: "Secret", mps: "13M/s" },
+  { name: "Tacorillo Crocodillo", rarity: "Secret", mps: "12.5M/s" },
+  { name: "Mariachi Corazoni", rarity: "Secret", mps: "12.5M/s" },
+  { name: "La Grande Combinasion", rarity: "Secret", mps: "10M/s" },
+  { name: "Los 25", rarity: "Secret", mps: "10M/s" },
+  { name: "Los Burritos", rarity: "Secret", mps: "8.5M/s" },
+  { name: "67", rarity: "Secret", mps: "7.5M/s" },
+  { name: "Donkeyturbo Express", rarity: "Secret", mps: "7.5M/s" },
+  { name: "Los Chicleteiras", rarity: "Secret", mps: "7M/s" },
+  { name: "Guest 666", rarity: "Secret", mps: "6.7M/s" },
+  { name: "Los Mi Gatitos", rarity: "Secret", mps: "6.5M/s" },
+  { name: "Rang Ring Bus", rarity: "Secret", mps: "6M/s" },
+  { name: "Granny", rarity: "Secret", mps: "6M/s" },
+  { name: "Noo my Present", rarity: "Secret", mps: "6M/s" },
+  { name: "Serafinna Medusella", rarity: "Secret", mps: "5.5M/s" },
+  { name: "Los Nooo My Hotspotsitos", rarity: "Secret", mps: "5.5M/s" },
+  { name: "Arcadopus", rarity: "Secret", mps: "5M/s" },
+  { name: "Noo my Candy", rarity: "Secret", mps: "5M/s" },
+  { name: "Los Quesadillas", rarity: "Secret", mps: "4.5M/s" },
+  { name: "Chicleteirina Bicicleteirina", rarity: "Secret", mps: "4M/s" },
+  { name: "Chill Puppy", rarity: "Secret", mps: "4M/s" },
+  { name: "Burrito Bandito", rarity: "Secret", mps: "4M/s" },
+  { name: "Luck Luck Luck Sahur", rarity: "Secret", mps: "3.8M/s" },
+  { name: "Chicleteira Bicicleteira", rarity: "Secret", mps: "3.5M/s" },
+  { name: "Brunito Marsito", rarity: "Secret", mps: "3.5M/s" },
+  { name: "Quesadillo Vampiro", rarity: "Secret", mps: "3.5M/s" },
+  { name: "Eid Eid Eid Sahur", rarity: "Secret", mps: "3.5M/s" },
+  { name: "Cupid Hotspot", rarity: "Secret", mps: "3.5M/s" },
+  { name: "Mi Gatito", rarity: "Secret", mps: "3.3M/s" },
+  { name: "Ho Ho Ho Sahur", rarity: "Secret", mps: "3.3M/s" },
+  { name: "Cupid Cupid Sahur", rarity: "Secret", mps: "3.1M/s" },
+  { name: "Pot Pumpkin", rarity: "Secret", mps: "3M/s" },
+  { name: "Naughty Naughty", rarity: "Secret", mps: "3M/s" },
+  { name: "Bunito Bunito Spinito", rarity: "Secret", mps: "3M/s" },
+  { name: "Quesadilla Crocodila", rarity: "Secret", mps: "3M/s" },
+  { name: "Horegini Boom", rarity: "Secret", mps: "2.8M/s" },
+  { name: "Santa Hotspot", rarity: "Secret", mps: "2.6M/s" },
+  { name: "Pot Hotspot", rarity: "Secret", mps: "2.5M/s" },
+  { name: "25", rarity: "Secret", mps: "2.5M/s" },
+  { name: "Pirulitoita Bicicleteira", rarity: "Secret", mps: "2.5M/s" },
+  { name: "To to to Sahur", rarity: "Secret", mps: "2.3M/s" },
+  { name: "Telemorte", rarity: "Secret", mps: "2M/s" },
+  { name: "La Sahur Combinasion", rarity: "Secret", mps: "2M/s" },
+  { name: "List List List Sahur", rarity: "Secret", mps: "2M/s" },
+  { name: "Noo my examine", rarity: "Secret", mps: "1.8M/s" },
+  { name: "Los Jobcitos", rarity: "Secret", mps: "1.5M/s" },
+  { name: "Nooo My Hotspot", rarity: "Secret", mps: "1.5M/s" },
+  { name: "Bunnyman", rarity: "Secret", mps: "1.5M/s" },
+  { name: "Tung Tung Tung Sahur", rarity: "Secret", mps: "1.5M/s" },
+  { name: "Cuadramat and Pakrahmatmamat", rarity: "Secret", mps: "1.4M/s" },
+  { name: "Please my Present", rarity: "Secret", mps: "1.3M/s" },
+  { name: "Los Cucarachas", rarity: "Secret", mps: "1.3M/s" },
+  { name: "1x1x1x1", rarity: "Secret", mps: "1.1M/s" },
+  { name: "La Vacca Lepre Lepreino", rarity: "Secret", mps: "1.1M/s" },
+  { name: "Love Love Love Sahur", rarity: "Secret", mps: "1M/s" },
+  { name: "Perrito Burrito", rarity: "Secret", mps: "1M/s" },
+  { name: "Graipuss Medussi", rarity: "Secret", mps: "1M/s" },
+  { name: "Giftini Spyderini", rarity: "Secret", mps: "1000K/s" },
+  { name: "GOAT", rarity: "Secret", mps: "950K/s" },
+  { name: "Trickolino", rarity: "Secret", mps: "900K/s" },
+  { name: "Paradiso Axolottino", rarity: "Secret", mps: "900K/s" },
+  { name: "Triplito Tralaleritos", rarity: "Secret", mps: "875K/s" },
+  { name: "La Vacca Jacko Linterino", rarity: "Secret", mps: "850K/s" },
+  { name: "Fishboard", rarity: "Secret", mps: "825K/s" },
+  { name: "Santteo", rarity: "Secret", mps: "800K/s" },
+  { name: "Las Vaquitas Saturnitas", rarity: "Secret", mps: "750K/s" },
+  { name: "Los Karkeritos", rarity: "Secret", mps: "750K/s" },
+  { name: "Karker Sahur", rarity: "Secret", mps: "725K/s" },
+  { name: "Los Trios", rarity: "Secret", mps: "700K/s" },
+  { name: "Job Job Job Sahur", rarity: "Secret", mps: "700K/s" },
+  { name: "Frankentteo", rarity: "Secret", mps: "700K/s" },
+  { name: "Pumpkini Spyderini", rarity: "Secret", mps: "650K/s" },
+  { name: "Las Tralaleritas", rarity: "Secret", mps: "650K/s" },
+  { name: "Rocco Disco", rarity: "Secret", mps: "650K/s" },
+  { name: "Extinct Matteo", rarity: "Secret", mps: "625K/s" },
+  { name: "La Karkerkar Combinasion", rarity: "Secret", mps: "600K/s" },
+  { name: "La Vacca Prese Presente", rarity: "Secret", mps: "600K/s" },
+  { name: "Reindeer Tralala", rarity: "Secret", mps: "600K/s" },
+  { name: "Yess my examine", rarity: "Secret", mps: "575K/s" },
+  { name: "Guerriro Digitale", rarity: "Secret", mps: "550K/s" },
+  { name: "Boatito Auratito", rarity: "Secret", mps: "525K/s" },
+  { name: "Vulturino Skeletono", rarity: "Secret", mps: "500K/s" },
+  { name: "Los Tralaleritos", rarity: "Secret", mps: "500K/s" },
+  { name: "Zombie Tralala", rarity: "Secret", mps: "500K/s" },
+  { name: "Los Tortus", rarity: "Secret", mps: "500K/s" },
+  { name: "La Cucaracha", rarity: "Secret", mps: "475K/s" },
+  { name: "Fragola La La La", rarity: "Secret", mps: "450K/s" },
+  { name: "Extinct Tralalero", rarity: "Secret", mps: "450K/s" },
+  { name: "Agarrini la Palini", rarity: "Secret", mps: "425K/s" },
+  { name: "Los Spyderinis", rarity: "Secret", mps: "425K/s" },
+  { name: "Chachechi", rarity: "Secret", mps: "400K/s" },
+  { name: "Blackhole Goat", rarity: "Secret", mps: "400K/s" },
+  { name: "Dul Dul Dul", rarity: "Secret", mps: "375K/s" },
+  { name: "Torrtuginni Dragonfrutini", rarity: "Secret", mps: "350K/s" },
+  { name: "Trenostruzzo Turbo 4000", rarity: "Secret", mps: "335K/s" },
+  { name: "Karkerkar Kurkur", rarity: "Secret", mps: "325K/s" },
+  { name: "Los Matteos", rarity: "Secret", mps: "325K/s" },
+  { name: "Bisonte Giuppitere", rarity: "Secret", mps: "325K/s" },
+  { name: "Sammyni Spyderini", rarity: "Secret", mps: "325K/s" },
+  { name: "La Vacca Saturno Saturnita", rarity: "Secret", mps: "325K/s" },
+  { name: "Jackorilla", rarity: "Secret", mps: "315K/s" },
+  { name: "Secret Lucky Block", rarity: "Secret", mps: "0/s" }
+];
+
 let selected = new Set();
 
 function renderList(filter) {
   const q = (filter || '').toLowerCase();
   const list = document.getElementById('animalList');
   list.innerHTML = '';
-  ANIMALS.forEach(name => {
-    if (q && !name.toLowerCase().includes(q)) return;
+  ANIMALS.forEach(animal => {
+    if (q && !animal.name.toLowerCase().includes(q)) return;
     const row = document.createElement('div');
-    row.className = 'a-item' + (selected.has(name) ? ' on' : '');
+    row.className = 'a-item' + (selected.has(animal.name) ? ' on' : '');
     const cb = document.createElement('input');
     cb.type = 'checkbox';
-    cb.checked = selected.has(name);
-    cb.addEventListener('change', e => { e.stopPropagation(); toggle(name); });
+    cb.checked = selected.has(animal.name);
+    cb.addEventListener('change', e => { e.stopPropagation(); toggle(animal.name); });
     const lbl = document.createElement('span');
     lbl.className = 'a-name';
-    lbl.textContent = name;
+    lbl.textContent = animal.name;
+    const meta = document.createElement('span');
+    meta.className = 'a-meta';
+    meta.textContent = `${animal.rarity} • ${animal.mps}`;
     row.appendChild(cb);
     row.appendChild(lbl);
-    row.addEventListener('click', e => { if (e.target !== cb) toggle(name); });
+    row.appendChild(meta);
+    row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
     list.appendChild(row);
   });
   document.getElementById('selNum').textContent = selected.size;
@@ -404,7 +617,7 @@ function toggle(name) {
 }
 
 function filterList() { renderList(document.getElementById('searchBox').value); }
-function selectAll() { ANIMALS.forEach(n => selected.add(n)); renderList(document.getElementById('searchBox').value); }
+function selectAll() { ANIMALS.forEach(n => selected.add(n.name)); renderList(document.getElementById('searchBox').value); }
 function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
 
 function validateUsername() {
