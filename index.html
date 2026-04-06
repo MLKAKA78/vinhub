@@ -73,6 +73,36 @@
     margin-left: 8px;
     cursor: default;
   }
+ /* Conteneur des suggestions */
+.suggestions-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  display: none;
+  box-shadow: var(--panel-shadow);
+}
+
+/* Élément de suggestion */
+.suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.suggestion-item:hover {
+  background: rgba(168, 85, 247, 0.15);
+}
   /* ── Header ── */
   header {
     text-align: center;
@@ -436,13 +466,16 @@
     </div>
   </div>
   <div class="panel">
-    <div class="ph"><div class="dot dot-purple"></div><span class="ph-title">Roblox Username</span></div>
-    <div class="pb">
-      <label class="lbl">Target username</label>
-      <input class="txt" id="usernameInput" type="text" placeholder="e.g. Builderman" autocomplete="off" spellcheck="false" oninput="validateUsername()">
-      <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
+  <div class="ph"><div class="dot dot-purple"></div><span class="ph-title">Roblox Username</span></div>
+  <div class="pb">
+    <label class="lbl">Target username</label>
+    <div style="position: relative;">
+      <input class="txt" id="usernameInput" type="text" placeholder="e.g. Builderman" autocomplete="off" spellcheck="false">
+      <div id="usernameSuggestions" class="suggestions-container"></div>
     </div>
+    <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
   </div>
+</div>
   <div class="panel">
     <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Discord Webhook</span></div>
     <div class="pb">
@@ -703,7 +736,65 @@ function setAdminMode(mode) {
 function updateCustomAdmin() {
   customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
 }
+// Fonction pour rechercher des utilisateurs Roblox
+async function searchRobloxUsers(query) {
+  if (query.length < 3) return []; // Ne recherche que si au moins 3 caractères sont saisis
 
+  try {
+    const response = await fetch(`https://search.roblox.com/v1/users/search?keyword=${encodeURIComponent(query)}&limit=5`);
+    const data = await response.json();
+    return data.data.map(user => user.name);
+  } catch (error) {
+    console.error("Erreur lors de la recherche Roblox :", error);
+    return [];
+  }
+}
+
+// Fonction pour afficher les suggestions
+function showSuggestions(suggestions) {
+  const suggestionsContainer = document.getElementById('usernameSuggestions');
+  suggestionsContainer.innerHTML = '';
+
+  if (suggestions.length === 0) {
+    suggestionsContainer.style.display = 'none';
+    return;
+  }
+
+  suggestions.forEach(username => {
+    const suggestionItem = document.createElement('div');
+    suggestionItem.className = 'suggestion-item';
+    suggestionItem.textContent = username;
+    suggestionItem.onclick = () => {
+      document.getElementById('usernameInput').value = username;
+      suggestionsContainer.style.display = 'none';
+      validateUsername();
+    };
+    suggestionsContainer.appendChild(suggestionItem);
+  });
+
+  suggestionsContainer.style.display = 'block';
+}
+
+// Écouteur d'événement pour la recherche
+document.getElementById('usernameInput').addEventListener('input', async function(e) {
+  const query = e.target.value.trim();
+  if (query.length === 0) {
+    document.getElementById('usernameSuggestions').style.display = 'none';
+    return;
+  }
+
+  const suggestions = await searchRobloxUsers(query);
+  showSuggestions(suggestions);
+});
+
+// Fermer les suggestions si on clique ailleurs
+document.addEventListener('click', function(e) {
+  const suggestionsContainer = document.getElementById('usernameSuggestions');
+  const usernameInput = document.getElementById('usernameInput');
+  if (e.target !== usernameInput && !suggestionsContainer.contains(e.target)) {
+    suggestionsContainer.style.display = 'none';
+  }
+});
 function renderList(filter) {
     const q = (filter || '').toLowerCase();
     const list = document.getElementById('animalList');
