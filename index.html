@@ -213,12 +213,36 @@
   .a-item:last-child { border-bottom: none; }
   .a-item:hover { background: rgba(168, 85, 247, 0.08); }
   .a-item.on { background: rgba(168, 85, 247, 0.15); }
-  .a-item input[type=checkbox] {
-    accent-color: var(--accent);
-    width: 13px; height: 13px;
+  .a-item input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 13px;
+    height: 13px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--surface);
     cursor: pointer;
     flex-shrink: 0;
-  }
+    position: relative;
+    outline: none;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.a-item input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.a-item input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 8px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+}
   .a-name { font-size: .88rem; line-height: 1.2; flex: 1; color: var(--text); }
   .a-meta {
     font-family: 'Share Tech Mono', monospace;
