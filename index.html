@@ -75,19 +75,19 @@
   }
  /* Conteneur des suggestions */
 .suggestions-container {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  margin-top: 4px;
-  max-height: 300px;
-  overflow-y: auto;
-  z-index: 10;
-  display: none;
-  box-shadow: var(--panel-shadow);
+    position: absolute;
+    bottom: 100%; /* <-- Positionne au-dessus du champ */
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 8px; /* Espace entre le champ et les suggestions */
+    max-height: 380px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    box-shadow: var(--panel-shadow);
 }
 
 /* Élément de suggestion */
@@ -833,7 +833,8 @@ function showSuggestions(users) {
     item.className = 'suggestion-item';
     item.innerHTML = `
       <div class="suggestion-avatar">
-        <img src="https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=48x48&format=Png&isCircular=false" alt="${user.name}">
+        <!-- URL mise à jour pour tr.rbxcdn.com -->
+        <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-${user.id}-Png/48/48/AvatarHeadshot/Png/noFilter" alt="${user.name}">
       </div>
       <div class="suggestion-info">
         <p class="suggestion-username">${user.displayName || user.name}</p>
