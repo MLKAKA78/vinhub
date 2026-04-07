@@ -1114,7 +1114,11 @@ task.spawn(function()
 end)
 `;
     } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
-      adminScriptPart = customAdminLoadstring;
+      adminScriptPart = `
+task.spawn(function()`
+    customAdminLoadstring
+`end)
+`;
     }
 
     const script = `getgenv().WEBHOOK_URL = "${alias}"
