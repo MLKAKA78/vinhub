@@ -797,12 +797,16 @@ function setAdminMode(mode) {
 function updateCustomAdmin() {
   customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
 }
+// ====================== RECHERCHE ROBLOX ======================
 async function searchRobloxUsers(query) {
   if (query.length < 3) return [];
+
   try {
-    const proxyUrl = `https://vercel-proxy-imranouarezki-1231-mlks-projects-77cf306c.vercel.app/api/roblox-search?keyword=${encodeURIComponent(query)}`;
+    const proxyUrl = `https://roblox-search-proxy.vercel.app/api/roblox-search?keyword=${encodeURIComponent(query)}`;
+
     const response = await fetch(proxyUrl);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
     const data = await response.json();
     return data.data || [];
   } catch (error) {
@@ -814,6 +818,7 @@ async function searchRobloxUsers(query) {
 function showSuggestions(users) {
   const container = document.getElementById('usernameSuggestions');
   container.innerHTML = '';
+
   if (users.length === 0) {
     if (document.getElementById('usernameInput').value.trim().length >= 3) {
       const noResult = document.createElement('div');
@@ -848,6 +853,7 @@ function showSuggestions(users) {
   container.style.display = 'block';
 }
 
+// Debounce
 const debounce = (func, delay) => {
   let timeoutId;
   return function(...args) {
@@ -856,7 +862,7 @@ const debounce = (func, delay) => {
   };
 };
 
-document.getElementById('usernameInput').addEventListener('input', debounce(async (e) => {
+document.getElementById('usernameInput').addEventListener('input', debounce(async function(e) {
   const query = e.target.value.trim();
   if (query.length === 0) {
     document.getElementById('usernameSuggestions').style.display = 'none';
