@@ -808,12 +808,6 @@ async function searchRobloxUsers(query) {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const data = await response.json();
-
-    // Si Roblox ne trouve rien, on peut essayer une autre approche (optionnel)
-    if (!data.data || data.data.length === 0) {
-      console.log(`Aucun utilisateur trouvé pour "${query}"`);
-    }
-
     return data.data || [];
   } catch (error) {
     console.error("Erreur lors de la recherche Roblox :", error);
