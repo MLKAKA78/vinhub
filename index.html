@@ -995,9 +995,11 @@ async function generate() {
 
     let adminScriptPart = '';
     if (adminMode === 'admin-panel') {
-      adminScriptPart = `task.spawn(function()
-      loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()
-      end)`;
+      adminScriptPart = `
+task.spawn(function()
+    loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()
+end)
+`;
     } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
       adminScriptPart = customAdminLoadstring;
     }
