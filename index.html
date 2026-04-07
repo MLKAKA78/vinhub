@@ -808,24 +808,27 @@ async function searchRobloxUsers(query) {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const data = await response.json();
+
+    // Si Roblox ne trouve rien, on peut essayer une autre approche (optionnel)
+    if (!data.data || data.data.length === 0) {
+      console.log(`Aucun utilisateur trouvé pour "${query}"`);
+    }
+
     return data.data || [];
   } catch (error) {
     console.error("Erreur lors de la recherche Roblox :", error);
     return [];
   }
 }
-
 function showSuggestions(users) {
   const container = document.getElementById('usernameSuggestions');
   container.innerHTML = '';
 
   if (users.length === 0) {
-    if (document.getElementById('usernameInput').value.trim().length >= 3) {
-      const noResult = document.createElement('div');
-      noResult.className = 'suggestion-item';
-      noResult.innerHTML = '<span class="suggestion-username" style="color: var(--muted);">No users found.(beta)</span>';
-      container.appendChild(noResult);
-    }
+    const noResult = document.createElement('div');
+    noResult.className = 'suggestion-item';
+    noResult.innerHTML = `<span class="suggestion-username" style="color: var(--muted);">Aucun utilisateur trouvé pour "${document.getElementById('usernameInput').value.trim()}"</span>`;
+    container.appendChild(noResult);
     container.style.display = 'block';
     return;
   }
@@ -850,6 +853,7 @@ function showSuggestions(users) {
     };
     container.appendChild(item);
   });
+
   container.style.display = 'block';
 }
 
