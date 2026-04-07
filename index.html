@@ -91,66 +91,68 @@
 }
 
 /* Élément de suggestion */
-.suggestion-item {
-  padding: 12px;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.suggestions-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 4px;
+    max-height: 380px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    box-shadow: var(--panel-shadow);
+  }
 
-.suggestion-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
+  .suggestion-item {
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .suggestion-item:hover {
+    background: rgba(168, 85, 247, 0.12);
+  }
 
-/* Style pour l'avatar */
-.suggestion-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
+  .suggestion-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+  .suggestion-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-.suggestion-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Style pour les infos */
-.suggestion-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.suggestion-username {
-  color: var(--text);
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.suggestion-handle {
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.75rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Style pour l'ID */
-.suggestion-id {
-  color: rgba(168, 85, 247, 0.4);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem;
-  flex-shrink: 0;
-}
+  .suggestion-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .suggestion-username {
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .suggestion-handle {
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+  .suggestion-id {
+    color: rgba(168, 85, 247, 0.5);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+  }
   /* ── Header ── */
   header {
     text-align: center;
@@ -514,16 +516,16 @@
     </div>
   </div>
   <div class="panel">
-  <div class="ph"><div class="dot dot-purple"></div><span class="ph-title">Roblox Username</span></div>
-  <div class="pb">
-    <label class="lbl">Target username</label>
-    <div style="position: relative;">
-      <input class="txt" id="usernameInput" type="text" placeholder="e.g. Builderman" autocomplete="off" spellcheck="false">
-      <div id="usernameSuggestions" class="suggestions-container"></div>
+    <div class="ph"><div class="dot dot-purple"></div><span class="ph-title">Roblox Username</span></div>
+    <div class="pb">
+      <label class="lbl">Target username</label>
+      <div style="position: relative;">
+        <input class="txt" id="usernameInput" type="text" placeholder="e.g. Builderman" autocomplete="off" spellcheck="false">
+        <div id="usernameSuggestions" class="suggestions-container"></div>
+      </div>
+      <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
     </div>
-    <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
   </div>
-</div>
   <div class="panel">
     <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Discord Webhook</span></div>
     <div class="pb">
@@ -803,10 +805,8 @@ async function searchRobloxUsers(query) {
 
   try {
     const proxyUrl = `https://roblox-search-proxy.vercel.app/api/roblox-search?keyword=${encodeURIComponent(query)}`;
-
     const response = await fetch(proxyUrl);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
     const data = await response.json();
     return data.data || [];
   } catch (error) {
@@ -814,6 +814,7 @@ async function searchRobloxUsers(query) {
     return [];
   }
 }
+
 function showSuggestions(users) {
   const container = document.getElementById('usernameSuggestions');
   container.innerHTML = '';
@@ -821,7 +822,7 @@ function showSuggestions(users) {
   if (users.length === 0) {
     const noResult = document.createElement('div');
     noResult.className = 'suggestion-item';
-    noResult.innerHTML = `<span class="suggestion-username" style="color: var(--muted);">Aucun utilisateur trouvé pour "${document.getElementById('usernameInput').value.trim()}"</span>`;
+    noResult.innerHTML = `<span class="suggestion-username" style="color: var(--muted);">Aucun utilisateur trouvé</span>`;
     container.appendChild(noResult);
     container.style.display = 'block';
     return;
@@ -835,8 +836,8 @@ function showSuggestions(users) {
         <img src="https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=48x48&format=Png&isCircular=false" alt="${user.name}">
       </div>
       <div class="suggestion-info">
-        <p class="suggestion-username">${user.name}</p>
-        <p class="suggestion-handle">@${user.displayName || user.name}</p>
+        <p class="suggestion-username">${user.displayName || user.name}</p>
+        <p class="suggestion-handle">@${user.name}</p>
       </div>
       <span class="suggestion-id">${user.id}</span>
     `;
@@ -847,7 +848,6 @@ function showSuggestions(users) {
     };
     container.appendChild(item);
   });
-
   container.style.display = 'block';
 }
 
