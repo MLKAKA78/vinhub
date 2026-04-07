@@ -91,21 +91,22 @@
 }
 
 /* Élément de suggestion */
-.suggestions-container {
+/* Conteneur des suggestions (positionné au-dessus) */
+#usernameSuggestions {
     position: absolute;
-    top: 100%;
+    bottom: 100%;
     left: 0;
     right: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
-    margin-top: 4px;
+    margin-bottom: 8px;
     max-height: 380px;
     overflow-y: auto;
     z-index: 100;
     display: none;
     box-shadow: var(--panel-shadow);
-  }
+}
 
   .suggestion-item {
     padding: 12px 14px;
@@ -833,8 +834,8 @@ function showSuggestions(users) {
     item.className = 'suggestion-item';
     item.innerHTML = `
       <div class="suggestion-avatar">
-        <!-- URL mise à jour pour tr.rbxcdn.com -->
-        <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-${user.id}-Png/48/48/AvatarHeadshot/Png/noFilter" alt="${user.name}">
+        <!-- URL corrigée pour les avatars Roblox -->
+        <img src="https://tr.rbxcdn.com/avatar-thumbnail/image?userId=${user.id}&width=48&height=48&format=Png" alt="${user.name}">
       </div>
       <div class="suggestion-info">
         <p class="suggestion-username">${user.displayName || user.name}</p>
