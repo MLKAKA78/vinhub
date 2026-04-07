@@ -832,11 +832,11 @@ function showSuggestions(users) {
     item.className = 'suggestion-item';
     item.innerHTML = `
       <div class="suggestion-avatar">
-        <img src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-${user.id}-Png/48/48/AvatarHeadshot/Png/noFilter" alt="${user.name}">
+        <img src="https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=48x48&format=Png&isCircular=false" alt="${user.name}">
       </div>
       <div class="suggestion-info">
         <p class="suggestion-username">${user.name}</p>
-        <p class="suggestion-handle">@${user.displayName || user.name.toLowerCase().replace(/\s+/g, '')}</p>
+        <p class="suggestion-handle">@${user.displayName || user.name}</p>
       </div>
       <span class="suggestion-id">${user.id}</span>
     `;
