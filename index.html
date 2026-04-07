@@ -816,7 +816,21 @@ async function searchRobloxUsers(query) {
   }
 }
 
-function showSuggestions(users) {
+async function fetchAvatarUrl(userId) {
+  try {
+    const response = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=48x48&format=Png&isCircular=false`);
+    const data = await response.json();
+    if (data.data && data.data[0] && data.data[0].imageUrl) {
+      return data.data[0].imageUrl;
+    }
+    return null;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'avatar :", error);
+    return null;
+  }
+}
+
+async function showSuggestions(users) {
   const container = document.getElementById('usernameSuggestions');
   container.innerHTML = '';
 
@@ -829,13 +843,21 @@ function showSuggestions(users) {
     return;
   }
 
-  users.forEach(user => {
+  // Attendre la récupération de toutes les URLs d'avatars
+  const userPromises = users.map(async (user) => {
+    const avatarUrl = await fetchAvatarUrl(user.id);
+    return { ...user, avatarUrl };
+  });
+
+  const usersWithAvatars = await Promise.all(userPromises);
+
+  usersWithAvatars.forEach(user => {
     const item = document.createElement('div');
     item.className = 'suggestion-item';
     item.innerHTML = `
       <div class="suggestion-avatar">
-        <!-- URL officielle Roblox pour les avatars -->
-        <img src="https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=48x48&format=Png&isCircular=false" alt="${user.name}">
+        <!-- Utilisation de l'URL extraite du JSON -->
+        <img src="${user.avatarUrl || 'https://via.placeholder.com/48'}" alt="${user.name}">
       </div>
       <div class="suggestion-info">
         <p class="suggestion-username">${user.displayName || user.name}</p>
