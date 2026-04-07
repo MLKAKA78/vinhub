@@ -547,11 +547,11 @@
       </div>
     </div>
   </div>
-  <button class="btn-gen" onclick="()">⚡  Script</button>
+  <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
   <div class="panel">
     <div class="out-ph">
       <div class="dot dot-green"></div>
-      <span class="out-ph-title">d Script</span>
+      <span class="out-ph-title">Generated Script</span>
       <button class="btn-copy" id="copyBtn" onclick="copyOut()">⧉ Copy</button>
     </div>
     <div class="pb">
@@ -1021,8 +1021,10 @@ ${adminScriptPart}
     out.textContent = script;
 
   } catch (err) {
-    out.className = 'code-block empty';
-    out.textContent = err.message || '-- Une erreur est survenue.';
+  console.error(err);
+  out.className = 'code-block empty';
+  out.textContent = '-- Une erreur est survenue lors de la génération.';
+}
   } finally {
     setTimeout(() => {
       btn.disabled = false;
