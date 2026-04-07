@@ -832,7 +832,22 @@ function logMessage(message) {
   logContainer.appendChild(logEntry);
   logContainer.scrollTop = logContainer.scrollHeight;
 }
+// Ajoute cette fonction avant publishScriptToPastefy
+function showStatus(message, isError = false) {
+  const statusBar = document.getElementById('status-bar');
+  const statusMessage = document.getElementById('status-message');
 
+  statusMessage.textContent = message;
+  statusMessage.className = isError ? 'error' : 'success';
+  statusBar.style.display = 'flex';
+
+  // Cache automatiquement après 5 secondes si c'est un succès
+  if (!isError) {
+    setTimeout(() => {
+      statusBar.style.display = 'none';
+    }, 5000);
+  }
+}
 // Ouvre la console du navigateur
 function openConsole() {
   logMessage("=== Console ouverte ===");
