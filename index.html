@@ -818,17 +818,15 @@ async function searchRobloxUsers(query) {
 
 async function fetchAvatarUrl(userId) {
   try {
-    // Utiliser ton proxy Vercel
     const proxyUrl = `https://avatar-proxy.vercel.app/api/avatar-proxy?userId=${userId}`;
     const response = await fetch(proxyUrl);
-    const data = await response.json();
-
-    if (data.imageUrl) {
-      return data.imageUrl;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    return null;
+    const data = await response.json();
+    return data.imageUrl || null;
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'avatar :", error);
+    console.warn(`Impossible de charger l'avatar pour l'utilisateur ${userId}:`, error.message);
     return null;
   }
 }
@@ -858,7 +856,7 @@ async function showSuggestions(users) {
   item.className = 'suggestion-item';
   item.innerHTML = `
     <div class="suggestion-avatar">
-      <img src="${user.avatarUrl || 'https://via.placeholder.com/48'}" alt="${user.name}" onerror="this.src='https://via.placeholder.com/48'">
+      <img src="${user.avatarUrl || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjI0Ii8+PC9zdmc+'}" alt="${user.name}">
     </div>
     <div class="suggestion-info">
       <p class="suggestion-username">${user.displayName || user.name}</p>
