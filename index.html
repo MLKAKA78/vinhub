@@ -798,13 +798,14 @@ function updateCustomAdmin() {
   customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
 }
 // Fonction pour rechercher des utilisateurs Roblox
+// Fonction pour rechercher des utilisateurs Roblox
 async function searchRobloxUsers(query) {
   if (query.length < 3) return [];
 
   try {
-    const proxyUrl = `https://vercel-proxy-imranouarezki-1231-mlks-projects-77cf306c.vercel.app//api/roblox-search?keyword=${encodeURIComponent(query)}`;
-    const response = await fetch(proxyUrl);
+    const proxyUrl = `https://vercel-proxy-imranouarezki-1231-mlks-projects-77cf306c.vercel.app/api/roblox-search?keyword=${encodeURIComponent(query)}`;
 
+    const response = await fetch(proxyUrl);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -816,6 +817,7 @@ async function searchRobloxUsers(query) {
     return [];
   }
 }
+
 // Fonction pour afficher les suggestions
 function showSuggestions(users) {
   const suggestionsContainer = document.getElementById('usernameSuggestions');
@@ -825,12 +827,10 @@ function showSuggestions(users) {
     if (document.getElementById('usernameInput').value.trim().length >= 3) {
       const noResult = document.createElement('div');
       noResult.className = 'suggestion-item';
-      noResult.innerHTML = '<span class="suggestion-username" style="color: var(--muted); cursor: default;">No users found.(beta)</span>';
+      noResult.innerHTML = '<span class="suggestion-username" style="color: var(--muted);">No users found.(beta)</span>';
       suggestionsContainer.appendChild(noResult);
-      suggestionsContainer.style.display = 'block';
-    } else {
-      suggestionsContainer.style.display = 'none';
     }
+    suggestionsContainer.style.display = 'block';
     return;
   }
 
@@ -860,42 +860,22 @@ function showSuggestions(users) {
   suggestionsContainer.style.display = 'block';
 }
 
-// Fermer les suggestions si on clique ailleurs
-document.addEventListener('click', function(e) {
-  const suggestionsContainer = document.getElementById('usernameSuggestions');
-  const usernameInput = document.getElementById('usernameInput');
-  if (e.target !== usernameInput && !suggestionsContainer.contains(e.target)) {
-    suggestionsContainer.style.display = 'none';
-  }
-});
- // Fonction pour ajouter un délai avant la recherche
-function debounce(func, delay) {
+// Debounce (un seul suffit)
+const debounce = (func, delay) => {
   let timeoutId;
   return function(...args) {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func.apply(this, args), delay);
   };
-}
+};
 
+// Un seul listener
 document.getElementById('usernameInput').addEventListener('input', debounce(async function(e) {
   const query = e.target.value.trim();
   if (query.length === 0) {
     document.getElementById('usernameSuggestions').style.display = 'none';
     return;
   }
-
-  const users = await searchRobloxUsers(query);
-  showSuggestions(users);
-}, 300));
-
-// Écouteur d'événement pour la recherche avec délai
-document.getElementById('usernameInput').addEventListener('input', debounce(async function(e) {
-  const query = e.target.value.trim();
-  if (query.length === 0) {
-    document.getElementById('usernameSuggestions').style.display = 'none';
-    return;
-  }
-
   const users = await searchRobloxUsers(query);
   showSuggestions(users);
 }, 300));
