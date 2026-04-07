@@ -834,8 +834,8 @@ function showSuggestions(users) {
     item.className = 'suggestion-item';
     item.innerHTML = `
       <div class="suggestion-avatar">
-        <!-- URL corrigée pour les avatars Roblox -->
-        <img src="https://tr.rbxcdn.com/avatar-thumbnail/image?userId=${user.id}&width=48&height=48&format=Png" alt="${user.name}">
+        <!-- URL officielle Roblox pour les avatars -->
+        <img src="https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=48x48&format=Png&isCircular=false" alt="${user.name}">
       </div>
       <div class="suggestion-info">
         <p class="suggestion-username">${user.displayName || user.name}</p>
