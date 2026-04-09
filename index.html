@@ -1085,13 +1085,12 @@ async function generate() {
 
 
     const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'
-      },
-      body: JSON.stringify({ alias, url: webhook })
-    });
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json', // ✅ Seule cette ligne est nécessaire
+  },
+  body: JSON.stringify({ alias, url: webhook })
+});
 
     if (!kvResponse.ok) throw new Error('Failed to store webhook.');
 
