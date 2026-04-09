@@ -852,10 +852,9 @@ function updateCustomAdmin() {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1',
   },
   body: JSON.stringify({ alias, url: webhook }),
-  mode: 'cors', // <-- Add this line
+  mode: 'cors',
 });
 
     if (!kvResponse.ok) throw new Error('Failed to store webhook.');
