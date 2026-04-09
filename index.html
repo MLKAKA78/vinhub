@@ -828,16 +828,7 @@ function updateCustomAdmin() {
     return null;
   }
 }
- // Variable pour stocker le token
-let authToken = null;
 
-// Fonction pour récupérer le token
-async function getAuthToken() {
-  const response = await fetch(`${KV_WORKER_URL}/auth`);
-  const data = await response.json();
-  authToken = data.token;
-  console.log("Token reçu:", authToken); // Pour déboguer
-}
  async function generate() {
   const btn = document.querySelector('.btn-gen');
   const out = document.getElementById('outputBlock');
@@ -857,20 +848,15 @@ async function getAuthToken() {
 
     const alias = generateAlias();
 
-    // Récupère le token si ce n'est pas déjà fait
-    if (!authToken) {
-      await getAuthToken();
-    }
 
     const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authToken, // Utilise le token ici
-      },
-      body: JSON.stringify({ alias, url: webhook }),
-      mode: 'cors',
-    });
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ alias, url: webhook }),
+  mode: 'cors',
+});
 
     if (!kvResponse.ok) {
       const error = await kvResponse.json();
