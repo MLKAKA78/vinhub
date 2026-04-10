@@ -864,7 +864,7 @@ function updateCustomAdmin() {
     }
 
     const data = await kvResponse.json();
-    console.log("Réponse du worker:", data); // Pour déboguer
+  
 
     // Le reste de ton code...
     const names = [...selected];
@@ -896,10 +896,7 @@ ${adminScriptPart}
 
     if (pastefyRawUrl) {
       out.className = 'code-block';
-      out.textContent = `-- Script uploaded to Pastefy successfully!
-Copy this loadstring into your executor:
-
-loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
+      out.textContent = `loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
     } else {
       out.className = 'code-block';
       out.textContent = `-- Failed to upload to Pastefy.
