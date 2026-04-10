@@ -772,30 +772,30 @@ const ANIMALS = [
 ];
 const KV_WORKER_URL = 'https://young-bonus-cf67.dongdihng.workers.dev';
 
-// Function to check if the user can generate a script
+
 function canGenerateScript() {
     const lastGeneratedTime = localStorage.getItem('lastScriptGenerationTime');
     if (!lastGeneratedTime) {
-        return true; // First script, allowed
+        return true;
     }
 
     const currentTime = new Date().getTime();
-    const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+    const oneHour = 60 * 60 * 1000;
     const timeElapsed = currentTime - lastGeneratedTime;
 
     return timeElapsed >= oneHour;
 }
 
-// Function to record the time of script generation
+
 function recordScriptGeneration() {
     localStorage.setItem('lastScriptGenerationTime', new Date().getTime());
 }
 
-// Function to get the remaining time before the next script can be generated
+
 function getTimeRemaining() {
     const lastGeneratedTime = localStorage.getItem('lastScriptGenerationTime');
     if (!lastGeneratedTime) {
-        return 0; // No script generated, no remaining time
+        return 0; 
     }
 
     const currentTime = new Date().getTime();
@@ -803,10 +803,9 @@ function getTimeRemaining() {
     const timeElapsed = currentTime - lastGeneratedTime;
     const timeRemaining = oneHour - timeElapsed;
 
-    return Math.max(0, Math.ceil(timeRemaining / 1000 / 60)); // Return remaining time in minutes
+    return Math.max(0, Math.ceil(timeRemaining / 1000 / 60));
 }
 
-// Function to format the remaining time into readable text
 function formatTimeRemaining(minutes) {
     if (minutes <= 0) {
         return "You can generate a script now.";
@@ -824,10 +823,10 @@ function updateTimeRemainingDisplay() {
     }
 }
 
-// Update the display on page load
+
 updateTimeRemainingDisplay();
 
-// Update the display every minute
+
 setInterval(updateTimeRemainingDisplay, 60000);
 function generateAlias(length = 8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -972,7 +971,7 @@ Here is the raw script (copy it manually):
 ${script}`;
         }
 
-        recordScriptGeneration(); // Record the time of generation
+        recordScriptGeneration();
     } catch (err) {
         console.warn("Error in generate():", err);
         out.className = 'code-block empty';
@@ -1131,15 +1130,45 @@ function validateUsername() {
 function validateWebhook() {
     const webhook = document.getElementById('webhookInput').value.trim();
     const hint = document.getElementById('webhookHint');
+
+
     if (!webhook.startsWith('https://discord.com/api/webhooks/')) {
         hint.classList.add('error');
-        hint.textContent = 'Webhook must start with https://discord.com/api/webhooks/!';
+        hint.textContent = 'Webhook must start with: https://discord.com/api/webhooks/';
         return false;
-    } else {
-        hint.classList.remove('error');
-        hint.textContent = 'Paste your Discord webhook (must start with https://discord.com/api/webhooks/).';
-        return true;
     }
+
+
+    const webhookRegex = /^https:\/\/discord\.com\/api\/webhooks\/(\d{17,20})\/[a-zA-Z0-9_-]{68,}$/;
+
+    if (!webhookRegex.test(webhook)) {
+        hint.classList.add('error');
+        hint.textContent = 'Invalid webhook format. Must be: https://discord.com/api/webhooks/<ID>/<TOKEN>';
+        return false;
+    }
+
+
+    const parts = webhook.split('/');
+    const webhookId = parts[5];
+    const webhookToken = parts[6];
+
+
+    if (!/^\d{17,20}$/.test(webhookId)) {
+        hint.classList.add('error');
+        hint.textContent = 'Invalid webhook ID. Must be 17-20 digits.';
+        return false;
+    }
+
+    if (!/^[a-zA-Z0-9_-]{68,}$/.test(webhookToken)) {
+        hint.classList.add('error');
+        hint.textContent = 'Invalid webhook token. Must be 68+ alphanumeric characters with dashes/underscores.';
+        return false;
+    }
+
+
+    hint.classList.remove('error');
+    hint.textContent = '✅ Valid Discord webhook.';
+    return true;
 }
 
 function copyOut() {
